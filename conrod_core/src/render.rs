@@ -276,12 +276,17 @@ impl<'a> Text<'a> {
             let (x, y) = (trans_x(line_rect.left()) as f32, trans_y(line_rect.bottom()) as f32);
             let point = text::rt::Point { x: x, y: y };
             use text::Font::*;
-            let layout = match font {
-                TrueType(ttf) => ttf.layout(line, scale, point).map(|g| text::PositionedGlyph::TrueType(g.standalone())),
+            match font {
+                TrueType(ttf) => {
+                    positioned_glyphs.extend(
+                        ttf.layout(line, scale, point).map(|g|
+                            text::PositionedGlyph::TrueType(g.standalone())));
+                },
+                Bitmap => {
+                    //None.into_iter().map(|_| text::PositionedGlyph::Bitmap);
+                },
             };
-            positioned_glyphs.extend(layout);
         }
-
         positioned_glyphs
     }
 

@@ -401,6 +401,17 @@ pub mod glyph {
                 let point = super::rt::Point { x: x, y: y };
                 let layout = match font {
                     super::Font::TrueType(ttf) => ttf.layout(line, scale, point),
+                    super::Font::Bitmap => {
+                        /*LayoutIter {
+                            font: self,
+                            chars: s.chars(),
+                            caret: 0.0,
+                            scale,
+                            start,
+                            last_glyph: None,
+                        }*/
+                    }
+                    //text::PositionedGlyph::Bitmap,
                 };
                 Rects {
                     next_left: line_rect.x.start,
@@ -479,6 +490,31 @@ pub mod glyph {
                 })
         }
     }
+
+    /*#[derive(Clone)]
+    pub struct LayoutIter<'a, 'b> {
+        font: &'b super::Font<'a>,
+        chars: ::std::str::Chars<'b>,
+        caret: f32,
+        scale: Scale,
+        start: Point<f32>,
+        last_glyph: Option<GlyphId>,
+    }
+    impl<'a, 'b> Iterator for LayoutIter<'a, 'b> {
+        type Item = super::PositionedGlyph<'a>;
+        fn next(&mut self) -> Option<super::PositionedGlyph<'a>> {
+            self.chars.next().map(|c| {
+                let g = self.font.glyph(c).scaled(self.scale);
+                if let Some(last) = self.last_glyph {
+                    self.caret += self.font.pair_kerning(self.scale, last, g.id());
+                }
+                let g = g.positioned(point(self.start.x + self.caret, self.start.y));
+                self.caret += g.sg.h_metrics().advance_width;
+                self.last_glyph = Some(g.id());
+                g
+            })
+        }
+    }*/
 
 }
 

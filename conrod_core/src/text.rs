@@ -16,14 +16,16 @@ pub mod rt {
 /// The RustType `FontCollection` type used by conrod.
 pub type FontCollection = ::rusttype::FontCollection<'static>;
 /// The RustType `Font` type used by conrod.
-pub type TTF = ::rusttype::Font<'static>;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Font {
     Bitmap,
-    TrueType(TTF),
+    TrueType(::rusttype::Font<'static>),
 }
 /// The RustType `PositionedGlyph` type used by conrod.
-pub type PositionedGlyph = ::rusttype::PositionedGlyph<'static>;
+pub enum PositionedGlyph {
+    Bitmap,
+    TrueType(::rusttype::PositionedGlyph<'static>),
+}
 
 /// An iterator yielding each line within the given `text` as a new `&str`, where the start and end
 /// indices into each line are provided by the given iterator.

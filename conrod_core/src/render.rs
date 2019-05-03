@@ -275,7 +275,11 @@ impl<'a> Text<'a> {
         for (line, line_rect) in lines.zip(line_rects) {
             let (x, y) = (trans_x(line_rect.left()) as f32, trans_y(line_rect.bottom()) as f32);
             let point = text::rt::Point { x: x, y: y };
-            positioned_glyphs.extend(font.layout(line, scale, point).map(|g| g.standalone()));
+            use text::Font::*;
+            let layout = match font {
+                TrueType(ttf) => ttf.layout(line, scale, point).map(|g| text::PositionedGlyph::TrueType(g.standalone())),
+            };
+            positioned_glyphs.extend(layout);
         }
 
         positioned_glyphs

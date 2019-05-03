@@ -16,7 +16,12 @@ pub mod rt {
 /// The RustType `FontCollection` type used by conrod.
 pub type FontCollection = ::rusttype::FontCollection<'static>;
 /// The RustType `Font` type used by conrod.
-pub type Font = ::rusttype::Font<'static>;
+pub type TTF = ::rusttype::Font<'static>;
+#[derive(Debug)]
+pub enum Font {
+    Bitmap,
+    TrueType(TTF),
+}
 /// The RustType `PositionedGlyph` type used by conrod.
 pub type PositionedGlyph = ::rusttype::PositionedGlyph<'static>;
 
@@ -226,7 +231,8 @@ pub mod font {
         where P: AsRef<std::path::Path>
     {
         let collection = collection_from_file(path)?;
-        collection.into_font().or(Err(Error::NoFont))
+        collection.into_font().map(|f| super::Font::TrueType(f))
+            .or(Err(Error::NoFont))
     }
 
 
@@ -391,9 +397,12 @@ pub mod glyph {
             lines_with_rects.next().map(|(line, line_rect)| {
                 let (x, y) = (line_rect.left() as f32, line_rect.top() as f32);
                 let point = super::rt::Point { x: x, y: y };
+                let layout = match font {
+                    super::Font::TrueType(ttf) => ttf.layout(line, scale, point),
+                };
                 Rects {
                     next_left: line_rect.x.start,
-                    layout: font.layout(line, scale, point),
+                    layout,
                     y: line_rect.y
                 }
             })
@@ -852,7 +861,9 @@ pub mod cursor {
                 let (x, y) = (line_rect.left() as f32, line_rect.top() as f32);
                 let point = super::rt::Point { x: x, y: y };
                 let y = line_rect.y;
-                let layout = font.layout(line, scale, point);
+                let layout = match font {
+                    super::Font::TrueType(ttf) => ttf.layout(line, scale, point),
+                };
                 let xs = Xs {
                     next_x: Some(line_rect.x.start),
                     layout: layout,
@@ -1091,13 +1102,17 @@ pub mod line {
                      scale: super::Scale,
                      last_glyph: &mut Option<super::GlyphId>) -> Scalar
     {
-        let g = font.glyph(ch).scaled(scale);
-        let kern = last_glyph
-            .map(|last| font.pair_kerning(scale, last, g.id()))
-            .unwrap_or(0.0);
-        let advance_width = g.h_metrics().advance_width;
-        *last_glyph = Some(g.id());
-        (kern + advance_width) as Scalar
+        match font {
+            super::Font::TrueType(ttf) => {
+                let g = ttf.glyph(ch).scaled(scale);
+                let kern = last_glyph
+                    .map(|last| ttf.pair_kerning(scale, last, g.id()))
+                    .unwrap_or(0.0);
+                let advance_width = g.h_metrics().advance_width;
+                *last_glyph = Some(g.id());
+                (kern + advance_width) as Scalar
+            },
+        }
     }
 
 
@@ -1247,7 +1262,10 @@ pub mod line {
         let point = super::rt::Point { x: 0.0, y: 0.0 };
 
         let mut total_w = 0.0;
-        for g in font.layout(text, scale, point) {
+        let layout = match font {
+            super::Font::TrueType(ttf) => ttf.layout(text, scale, point),
+        };
+        for g in layout {
             match g.pixel_bounding_box() {
                 Some(bb) => total_w = bb.max.x as f32,
                 None => total_w += g.unpositioned().h_metrics().advance_width,

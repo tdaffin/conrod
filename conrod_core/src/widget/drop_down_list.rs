@@ -271,7 +271,8 @@ impl<'a, T> Widget for DropDownList<'a, T>
                 let num_items = self.items.len();
                 let item_h = h;
                 let list_h = max_visible_height.min(num_items as Scalar * item_h);
-                let scrollbar_color = style.border_color(&ui.theme);
+                let scrollbar_handle_color = style.color(&ui.theme);
+                let scrollbar_track_color = style.border_color(&ui.theme);
                 let scrollbar_position = style.scrollbar_position(&ui.theme);
                 let scrollbar_width = style.scrollbar_width(&ui.theme)
                     .unwrap_or_else(|| {
@@ -289,7 +290,8 @@ impl<'a, T> Widget for DropDownList<'a, T>
                         Some(widget::list::ScrollbarPosition::OnTop) => ls.scrollbar_on_top(),
                         None => ls,
                     })
-                    .scrollbar_color(scrollbar_color)
+                    .scrollbar_handle_color(scrollbar_handle_color)
+                    .scrollbar_track_color(scrollbar_track_color)
                     .scrollbar_thickness(scrollbar_width)
                     .mid_top_of(id)
                     .floating(true)

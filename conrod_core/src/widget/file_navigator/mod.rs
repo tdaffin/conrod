@@ -237,7 +237,7 @@ impl<'a> Widget for FileNavigator<'a> {
 
         // A scrollbar for the `FOOTER` canvas.
         widget::Scrollbar::x_axis(state.ids.scrollable_canvas)
-            .color(color.plain_contrast())
+            .handle_color(color.plain_contrast())
             .auto_hide(true)
             .set(state.ids.scrollbar, ui);
 

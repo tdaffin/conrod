@@ -38,12 +38,15 @@ pub trait Axis: scroll::Axis + Sized {
     fn to_2d(scalar: Scalar) -> [Scalar; 2];
 }
 
-/// Styling for the DropDownList, necessary for constructing its renderable Element.
+/// Styling for the Scrollbar, necessary for constructing its renderable Element.
 #[derive(Copy, Clone, Debug, Default, PartialEq, WidgetStyle_)]
 pub struct Style {
-    /// Color of the widget.
+    /// Color of the scrollbar's handle.
+    #[conrod(default = "theme.shape_color")]
+    pub handle_color: Option<Color>,
+    /// Color of the scrollbar's track.
     #[conrod(default = "theme.border_color")]
-    pub color: Option<Color>,
+    pub track_color: Option<Color>,
     /// The "thickness" of the scrollbar's track and handle `Rect`s.
     #[conrod(default = "10.0")]
     pub thickness: Option<Scalar>,
@@ -77,6 +80,28 @@ impl<A> Scrollbar<A> {
             widget: widget,
             axis: std::marker::PhantomData,
         }
+    }
+
+    /// The color of the handle of the `Scrollbar`.
+    /// 
+    /// The handle is the area of the scrollbar that the
+    /// user clicks on and drags over the track
+    /// 
+    /// By default this is set to the 'shape_color' of the theme
+    pub fn handle_color(mut self, color: Color) -> Self {
+        self.style.handle_color = Some(color);
+        self
+    }
+
+    /// The color of the track of the `Scrollbar`.
+    /// 
+    /// The track is the background of the scrollbar that
+    /// the handle can be dragged in.
+    /// 
+    /// By default this is set to the 'border_color' of the theme
+    pub fn track_color(mut self, color: Color) -> Self {
+        self.style.track_color = Some(color);
+        self
     }
 
     /// By default, this is set to `false`.
@@ -263,22 +288,22 @@ impl<A> Widget for Scrollbar<A>
             }
         }
 
-        let color = style.color(ui.theme());
-        let color = if not_scrollable {
-            color
+        let handle_color = style.handle_color(ui.theme());
+        let track_color = style.track_color(ui.theme());
+        let handle_color = if not_scrollable {
+            handle_color
         } else {
             ui.widget_input(id)
                 .mouse()
                 .map(|m| if m.buttons.left().is_down() {
-                    color.clicked()
+                    handle_color.clicked()
                 } else {
-                    color.highlighted()
+                    handle_color.highlighted()
                 })
-                .unwrap_or_else(|| color)
+                .unwrap_or_else(|| handle_color)
         };
 
         // The `Track` widget along which the handle will slide.
-        let track_color = color.alpha(0.25);
         widget::Rectangle::fill(rect.dim())
             .xy(rect.xy())
             .color(track_color)
@@ -290,7 +315,7 @@ impl<A> Widget for Scrollbar<A>
         // can be dragged over the track.
         widget::Rectangle::fill(handle_rect.dim())
             .xy(handle_rect.xy())
-            .color(color)
+            .color(handle_color)
             .graphics_for(id)
             .parent(id)
             .set(state.ids.handle, ui);
@@ -363,8 +388,4 @@ impl Axis for Y {
         [0.0, scalar]
     }
 
-}
-
-impl<A> Colorable for Scrollbar<A> {
-    builder_method!(color { style.color = Some(Color) });
 }

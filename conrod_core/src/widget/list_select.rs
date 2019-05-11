@@ -307,9 +307,15 @@ impl<M, D, S> ListSelect<M, D, S> {
         self
     }
 
-    /// The color of the `Scrollbar`.
-    pub fn scrollbar_color(mut self, color: Color) -> Self {
-        self.style.scrollbar_color = Some(color);
+    /// The color of the handle of the `Scrollbar`.
+    pub fn scrollbar_handle_color(mut self, color: Color) -> Self {
+        self.style.scrollbar_handle_color = Some(color);
+        self
+    }
+
+    /// The color of the track of the `Scrollbar`.
+    pub fn scrollbar_track_color(mut self, color: Color) -> Self {
+        self.style.scrollbar_track_color = Some(color);
         self
     }
 

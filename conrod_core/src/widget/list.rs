@@ -124,9 +124,12 @@ pub struct Style {
     /// The width of the scrollbar if it is visible.
     #[conrod(default = "None")]
     pub scrollbar_thickness: Option<Option<Scalar>>,
-    /// The color of the scrollbar if it is visible.
+    /// Color of the scrollbar's handle, if the scrollbar is visible.
+    #[conrod(default = "theme.shape_color")]
+    pub scrollbar_handle_color: Option<Color>,
+    /// Color of the scrollbar's track, if the scrollbar is visible.
     #[conrod(default = "theme.border_color")]
-    pub scrollbar_color: Option<Color>,
+    pub scrollbar_track_color: Option<Color>,
     /// The location of the `List`'s scrollbar.
     #[conrod(default = "None")]
     pub scrollbar_position: Option<Option<ScrollbarPosition>>,
@@ -325,9 +328,15 @@ impl<D, S> List<D, S>
         self
     }
 
-    /// The color of the `Scrollbar`.
-    pub fn scrollbar_color(mut self, color: Color) -> Self {
-        self.style.scrollbar_color = Some(color);
+    /// The color of the handle of the `Scrollbar`.
+    pub fn scrollbar_handle_color(mut self, color: Color) -> Self {
+        self.style.scrollbar_handle_color = Some(color);
+        self
+    }
+
+    /// The color of the track of the `Scrollbar`.
+    pub fn scrollbar_track_color(mut self, color: Color) -> Self {
+        self.style.scrollbar_track_color = Some(color);
         self
     }
 }
@@ -611,10 +620,12 @@ impl ItemSize for Fixed {
             (_, Some(ScrollbarPosition::NextTo)) => false,
             (_, Some(ScrollbarPosition::OnTop)) => true,
         };
-        let scrollbar_color = style.scrollbar_color(&ui.theme);
+        let scrollbar_handle_color = style.scrollbar_handle_color(&ui.theme);
+        let scrollbar_track_color = style.scrollbar_track_color(&ui.theme);
         let scrollbar = D::scrollbar(id)
             .and_if(prev.maybe_floating.is_some(), |s| s.floating(true))
-            .color(scrollbar_color)
+            .handle_color(scrollbar_handle_color)
+            .track_color(scrollbar_track_color)
             .thickness(scrollbar_thickness)
             .auto_hide(auto_hide);
         let scrollbar = Scrollbar {
@@ -689,10 +700,12 @@ impl ItemSize for Dynamic {
             Some(ScrollbarPosition::NextTo) => false,
             Some(ScrollbarPosition::OnTop) => true,
         };
-        let scrollbar_color = style.scrollbar_color(&ui.theme);
+        let scrollbar_handle_color = style.scrollbar_handle_color(&ui.theme);
+        let scrollbar_track_color = style.scrollbar_track_color(&ui.theme);
         let scrollbar = D::scrollbar(id)
             .and_if(prev.maybe_floating.is_some(), |s| s.floating(true))
-            .color(scrollbar_color)
+            .handle_color(scrollbar_handle_color)
+            .track_color(scrollbar_track_color)
             .thickness(scrollbar_thickness)
             .auto_hide(auto_hide);
         let scrollbar = Scrollbar {

@@ -221,30 +221,31 @@ impl<'a, T> Widget for DropDownList<'a, T>
         let selected = self.selected.and_then(|idx| if idx < num_items { Some(idx) }
                                                     else { None });
 
+        // Get the button index and the label for the closed menu's button.
+        let label = selected
+            .map(|i| self.items[i].as_ref())
+            .unwrap_or_else(|| self.maybe_label.unwrap_or(""));
+
+        let was_clicked = {
+            // use the pre-existing Button widget
+            let mut button = widget::Button::new()
+                .xy(rect.xy())
+                .wh(rect.dim())
+                .label(label)
+                .parent(id);
+            button.style = style.button_style(false);
+            button.set(state.ids.closed_menu, ui).was_clicked()
+        };
+
         // Track whether or not a list item was clicked.
         let mut clicked_item = None;
 
         // Act on the current menu state and determine what the next one will be.
         // new_menu_state is what we will be getting passed next frame
         let new_menu_state = match state.menu_state {
-
-            // If closed, we only want the button at the selected index to be drawn.
+            
             MenuState::Closed => {
-                // Get the button index and the label for the closed menu's button.
-                let label = selected
-                    .map(|i| self.items[i].as_ref())
-                    .unwrap_or_else(|| self.maybe_label.unwrap_or(""));
-
-                let was_clicked = {
-                    // use the pre-existing Button widget
-                    let mut button = widget::Button::new()
-                        .xy(rect.xy())
-                        .wh(rect.dim())
-                        .label(label)
-                        .parent(id);
-                    button.style = style.button_style(false);
-                    button.set(state.ids.closed_menu, ui).was_clicked()
-                };
+                // If closed, we only want the button at the selected index to be drawn.
 
                 // If the button was clicked, then open, otherwise stay closed
                 if was_clicked { MenuState::Open } else { MenuState::Closed }
@@ -291,7 +292,7 @@ impl<'a, T> Widget for DropDownList<'a, T>
                     })
                     .scrollbar_color(scrollbar_color)
                     .scrollbar_thickness(scrollbar_width)
-                    .mid_top_of(id)
+                    .down_from(state.ids.closed_menu, 0.0)
                     .floating(true)
                     .set(state.ids.list, ui);
 

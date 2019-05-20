@@ -1,6 +1,7 @@
 //! A helper widget, useful for instantiating a sequence of widgets in a vertical list.
 
 use {
+    Borderable,
     color,
     Color,
     Colorable,
@@ -133,6 +134,12 @@ pub struct Style {
     /// The location of the `List`'s scrollbar.
     #[conrod(default = "None")]
     pub scrollbar_position: Option<Option<ScrollbarPosition>>,
+    /// Set the width of the scrollbar's border.
+    #[conrod(default = "theme.border_width")]
+    pub scrollbar_border: Option<Scalar>,
+    /// Set the color of the scrollbar's border.
+    #[conrod(default = "theme.border_color")]
+    pub scrollbar_border_color: Option<Color>,
 }
 
 widget_ids! {
@@ -339,6 +346,19 @@ impl<D, S> List<D, S>
         self.style.scrollbar_track_color = Some(color);
         self
     }
+
+    /// The width of the border of the `Scrollbar`.
+    pub fn scrollbar_border(mut self, border: Scalar) -> Self {
+        self.style.scrollbar_border = Some(border);
+        self
+    }
+ 
+    /// Set the color of the scrollbar's border.
+    pub fn scrollbar_border_color(mut self, color: Color) -> Self{
+        self.style.scrollbar_border_color = Some(color);
+        self
+    }
+
 }
 
 impl<D, S> Widget for List<D, S>
@@ -622,12 +642,16 @@ impl ItemSize for Fixed {
         };
         let scrollbar_handle_color = style.scrollbar_handle_color(&ui.theme);
         let scrollbar_track_color = style.scrollbar_track_color(&ui.theme);
+        let scrollbar_border = style.scrollbar_border(&ui.theme);
+        let scrollbar_border_color = style.scrollbar_border_color(&ui.theme);
         let scrollbar = D::scrollbar(id)
             .and_if(prev.maybe_floating.is_some(), |s| s.floating(true))
             .handle_color(scrollbar_handle_color)
             .track_color(scrollbar_track_color)
             .thickness(scrollbar_thickness)
-            .auto_hide(auto_hide);
+            .auto_hide(auto_hide)
+            .border(scrollbar_border)
+            .border_color(scrollbar_border_color);
         let scrollbar = Scrollbar {
             widget: scrollbar,
             id: state.ids.scrollbar,

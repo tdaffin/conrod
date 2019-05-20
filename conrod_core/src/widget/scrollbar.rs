@@ -1,6 +1,6 @@
 //! A widget that allows for manually scrolling via dragging the mouse.
 
-use {Color, Colorable, Positionable, Ui};
+use {Color, Colorable, Borderable, Positionable, Ui};
 use graph;
 use position::{Dimension, Range, Rect, Scalar};
 use std;
@@ -47,6 +47,12 @@ pub struct Style {
     /// Color of the scrollbar's track.
     #[conrod(default = "theme.border_color")]
     pub track_color: Option<Color>,
+    /// The width of the track's `BorderedRectangle` border.
+    #[conrod(default = "theme.border_width")]
+    pub border: Option<Scalar>,
+    /// The color of the track's `BorderedRecangle`'s border.
+    #[conrod(default = "theme.border_color")]
+    pub border_color: Option<Color>,
     /// The "thickness" of the scrollbar's track and handle `Rect`s.
     #[conrod(default = "10.0")]
     pub thickness: Option<Scalar>,
@@ -290,6 +296,8 @@ impl<A> Widget for Scrollbar<A>
 
         let handle_color = style.handle_color(ui.theme());
         let track_color = style.track_color(ui.theme());
+        let border = style.border(ui.theme());
+        let border_color = style.border_color(ui.theme());
         let handle_color = if not_scrollable {
             handle_color
         } else {
@@ -313,8 +321,10 @@ impl<A> Widget for Scrollbar<A>
 
         // The `Handle` widget used as a graphical representation of the part of the scrollbar that
         // can be dragged over the track.
-        widget::Rectangle::fill(handle_rect.dim())
+        widget::BorderedRectangle::new(handle_rect.dim())
             .xy(handle_rect.xy())
+            .border(border)
+            .border_color(border_color)
             .color(handle_color)
             .graphics_for(id)
             .parent(id)
@@ -388,4 +398,15 @@ impl Axis for Y {
         [0.0, scalar]
     }
 
+}
+
+impl<A> Colorable for Scrollbar<A> {
+    builder_method!(color { style.handle_color = Some(Color) });
+}
+
+impl<A> Borderable for Scrollbar<A> {
+    builder_methods!{
+        border { style.border = Some(Scalar) }
+        border_color { style.border_color = Some(Color) }
+    }
 }

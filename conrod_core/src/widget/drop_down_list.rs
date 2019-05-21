@@ -243,6 +243,16 @@ impl<'a, T> Widget for DropDownList<'a, T>
         // Act on the current menu state and determine what the next one will be.
         // new_menu_state is what we will be getting passed next frame
         let new_menu_state = match state.menu_state {
+
+            // TODO: The closed state should have a triangle showing which way the list will drop
+            // See collapsible_area for an example
+            // TODO: Triangle direction for collapsible_area should be configurable
+            
+            // TODO: Always draw the closed state, and always add the Open state so that it
+            // does not overlap the closed state
+
+
+
             
             MenuState::Closed => {
                 // If closed, we only want the button at the selected index to be drawn.

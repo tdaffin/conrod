@@ -319,6 +319,17 @@ impl<M, D, S> ListSelect<M, D, S> {
         self
     }
 
+    /// The width of the border of the `Scrollbar`.
+    pub fn scrollbar_border(mut self, border: Scalar) -> Self {
+        self.style.scrollbar_border = Some(border);
+        self
+    }
+ 
+    /// Set the color of the scrollbar's border.
+    pub fn scrollbar_border_color(mut self, color: Color) -> Self{
+        self.style.scrollbar_border_color = Some(color);
+        self
+    }
 }
 
 impl<M, D> ListSelect<M, D, widget::list::Fixed> {

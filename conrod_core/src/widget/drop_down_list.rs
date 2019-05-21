@@ -273,6 +273,8 @@ impl<'a, T> Widget for DropDownList<'a, T>
                 let list_h = max_visible_height.min(num_items as Scalar * item_h);
                 let scrollbar_handle_color = style.color(&ui.theme);
                 let scrollbar_track_color = style.border_color(&ui.theme);
+                let scrollbar_border = style.border(&ui.theme);
+                let scrollbar_border_color = style.border_color(&ui.theme);
                 let scrollbar_position = style.scrollbar_position(&ui.theme);
                 let scrollbar_width = style.scrollbar_width(&ui.theme)
                     .unwrap_or_else(|| {
@@ -293,6 +295,8 @@ impl<'a, T> Widget for DropDownList<'a, T>
                     .scrollbar_handle_color(scrollbar_handle_color)
                     .scrollbar_track_color(scrollbar_track_color)
                     .scrollbar_thickness(scrollbar_width)
+                    .scrollbar_border(scrollbar_border)
+                    .scrollbar_border_color(scrollbar_border_color)
                     .mid_top_of(id)
                     .floating(true)
                     .set(state.ids.list, ui);

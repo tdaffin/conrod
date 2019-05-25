@@ -1,0 +1,22 @@
+I made a branch with some changes to the shared examples to demonstrate the problem I saw here: https://github.com/tdaffin/conrod/tree/list_crop_bug
+
+You can then run the example for multiple backends.  Originally I saw the same problem for both the gfx and piston backends, but not for glium or vulkano.
+
+Run it for gfx using:
+`cargo run --example all_winit_gfx`
+
+I've also made a branch that merges the fix into the shared example branch: https://github.com/tdaffin/conrod/tree/fix_list_crop_bug
+
+cargo run --example all_winit_gfx
+    see problem, not fixed by change
+    
+cargo run --example all_piston_window
+    same problem, fixed by change
+    
+cargo run --example all_winit_vulkano
+    works ok both with and without fix
+    
+cargo run --example all_winit_glium
+    works ok both with and without fix
+
+

@@ -12,6 +12,7 @@
 
 #[macro_use] extern crate conrod_core;
 extern crate rand;
+extern crate input;
 
 mod layout;
 mod text;
@@ -22,32 +23,142 @@ mod number_dialer_plotpath;
 
 use layout::*;
 
-use conrod_core::{widget, Rect, Ui, UiCell, Widget};
+use conrod_core::{
+    Rect,
+    Theme,
+    Ui,
+    UiCell,
+    Widget,
+    widget
+};
 
-pub const WIN_W: u32 = 600;
-pub const WIN_H: u32 = 420;
-
-/// A demonstration of some application state we want to control with a conrod GUI.
-pub struct DemoApp {
-    button_xy_pad_toggle: button_xy_pad_toggle::GuiState,
-    sine_frequency: f32,
-    rust_logo: conrod_core::image::Id,
+#[derive(Copy, Clone)]
+pub enum Example {
+    New,
 }
 
+impl Example {
 
-impl DemoApp {
-    /// Simple constructor for the `DemoApp`.
-    pub fn new(rust_logo: conrod_core::image::Id) -> Self {
-        DemoApp {
-            button_xy_pad_toggle: button_xy_pad_toggle::GuiState::new(),
-            sine_frequency: 1.0,
-            rust_logo: rust_logo,
+    pub fn name(&self) -> &'static str {
+        match self {
+            Example::New => "All Widgets",
+        }
+    }
+
+    pub fn size(&self) -> (u32, u32) {
+        match self {
+            Example::New => (600, 420),
+        }
+    }
+
+    pub fn new_ui(&self) -> Ui {
+        let (win_w, win_h) = self.size();
+        conrod_core::UiBuilder::new([win_w as f64, win_h as f64]).build()
+    }
+
+    pub fn theme(&self) -> Theme {
+        match self {
+            Example::New => theme(),
+        }
+    }
+
+    pub fn next(&self) -> Example {
+        match self {
+            Example::New => Example::New,
         }
     }
 }
 
+pub struct Namer {
+    prefix: String,
+}
+
+impl Namer {
+    pub fn new(prefix: &str) -> Self {
+        Self {
+            prefix: prefix.to_owned(),
+        }
+    }
+
+    pub fn title(&self, example: &Example) -> String {
+        format!("{} - {}, [Tab] Changes Example", self.prefix, example.name())
+    }
+}
+
+pub struct Manager {
+    example: Example,
+    maybe_ui: Option<Ui>,
+}
+
+impl Manager {
+    pub fn new() -> Self {
+        Self::new_from(Example::New)
+    }
+
+    pub fn new_from(example: Example) -> Self {
+        Self {
+            example,
+            maybe_ui: None,
+        }
+    }
+
+    pub fn example(&self) -> Example {
+        self.example
+    }
+
+    pub fn ui(&mut self) -> &mut Ui {
+        match self.maybe_ui {
+            Some(ref mut ui) => ui,
+            None => {
+                let example = self.example;
+                self.maybe_ui.get_or_insert_with(|| example.new_ui())
+            }
+        }
+    }
+
+    pub fn win_w(&self) -> u32 {
+        self.example.size().0
+    }
+
+    pub fn win_h(&self) -> u32 {
+        self.example.size().1
+    }
+
+    pub fn theme(&self) -> Theme {
+        self.example.theme()
+    }
+
+    pub fn handle_event(&mut self, event: conrod_core::event::Input) -> Option<Example> {
+        use conrod_core::event::Input::*;
+        match event {
+            Focus(_focussed) => {
+            },
+            Release(button) => {
+                if let input::Button::Keyboard(key) = button {
+                    if key == input::Key::Backquote {
+                        // Change backend
+                    }
+                    if key == input::Key::Tab {
+                        // Change example
+                        self.example = self.example.next();
+                        self.update_theme();
+                        return Some(self.example);
+                    }
+                }
+            },
+            _ => {},
+        }
+        self.ui().handle_event(event);
+        None
+    }
+
+    fn update_theme(&mut self) {
+        self.ui().theme = self.example.theme();
+    }
+}
+
 /// A set of reasonable stylistic defaults that works for the `gui` below.
-pub fn theme() -> conrod_core::Theme {
+fn theme() -> conrod_core::Theme {
     use conrod_core::position::{Align, Direction, Padding, Position, Relative};
     conrod_core::Theme {
         name: "Demo Theme".to_string(),
@@ -69,6 +180,25 @@ pub fn theme() -> conrod_core::Theme {
     }
 }
 
+/// A demonstration of some application state we want to control with a conrod GUI.
+pub struct DemoApp {
+    button_xy_pad_toggle: button_xy_pad_toggle::GuiState,
+    sine_frequency: f32,
+    rust_logo: conrod_core::image::Id,
+}
+
+
+impl DemoApp {
+    /// Simple constructor for the `DemoApp`.
+    pub fn new(rust_logo: conrod_core::image::Id) -> Self {
+        DemoApp {
+            button_xy_pad_toggle: button_xy_pad_toggle::GuiState::new(),
+            sine_frequency: 1.0,
+            rust_logo: rust_logo,
+        }
+    }
+}
+
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {
     pub struct Ids {
@@ -76,6 +206,8 @@ widget_ids! {
         canvas,
         // Scrollbar
         canvas_scrollbar,
+        // A non-scrolling overlay canvas
+        overlay,
     }
 }
 
@@ -89,7 +221,9 @@ pub struct Gui {
 }
 
 impl Gui {
-    pub fn new(ui: &mut Ui) -> Self {
+    pub fn new(manager: &mut Manager) -> Self {
+        manager.update_theme();
+        let ui = manager.ui();
         Self {
             ids: Ids::new(ui.widget_id_generator()),
             text: text::Gui::new(ui),
@@ -101,9 +235,27 @@ impl Gui {
     }
 
     /// Instantiate a GUI demonstrating every widget available in conrod.
-    pub fn update(&self, ui: &mut UiCell, app: &mut DemoApp) {
+    pub fn update_ui(&self, manager: &mut Manager, app: &mut DemoApp) {
+        //manager.update_theme();
+        let ui = &mut manager.ui().set_widgets();
+        match manager.example {
+            Example::New => {
+                self.update_new(ui, app);
+
+                // Transparent overlay canvas, the size of the window
+                /*
+                let window = ui.window;
+                widget::Canvas::new()
+                    .top_left_of(window)
+                    .wh_of(window)
+                    .set(self.ids.overlay, ui);*/
+            },
+        }
+    }
+
+    fn update_new(&self, ui: &mut UiCell, app: &mut DemoApp){
         let ids = &self.ids;
-        let canvas = ids.canvas;
+        let canvas = self.ids.canvas;
 
         // `Canvas` is a widget that provides some basic functionality for laying out children widgets.
         // By default, its size is the size of the window. We'll use this as a background for the

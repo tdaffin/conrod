@@ -6,18 +6,19 @@ extern crate find_folder;
 extern crate piston_window;
 extern crate conrod_piston;
 
-use self::piston_window::{PistonWindow, UpdateEvent, Window, WindowSettings};
+use self::piston_window::{AdvancedWindow, PistonWindow, UpdateEvent, Window, WindowSettings};
 use self::piston_window::{Flip, G2d, G2dTexture, Texture, TextureSettings};
 use self::piston_window::OpenGL;
 use self::piston_window::texture::UpdateTexture;
 
 pub fn main() {
-    const WIDTH: u32 = conrod_example_shared::WIN_W;
-    const HEIGHT: u32 = conrod_example_shared::WIN_H;
+    let mut manager = conrod_example_shared::Manager::new();
+    let namer = conrod_example_shared::Namer::new("Piston Backend");
 
     // Construct the window.
     let mut window: PistonWindow =
-        WindowSettings::new("All Widgets - Piston Backend", [WIDTH, HEIGHT])
+        WindowSettings::new(namer.title(&manager.example()),
+                [manager.win_w(), manager.win_h()])
             .opengl(OpenGL::V3_2) // If not working, try `OpenGL::V2_1`.
             .samples(4)
             .exit_on_esc(true)
@@ -25,15 +26,10 @@ pub fn main() {
             .build()
             .unwrap();
 
-    // construct our `Ui`.
-    let mut ui = conrod_core::UiBuilder::new([WIDTH as f64, HEIGHT as f64])
-        .theme(conrod_example_shared::theme())
-        .build();
-
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    ui.fonts.insert_from_file(font_path).unwrap();
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Create a texture to use for efficiently caching text on the GPU.
     let mut text_vertex_data = Vec::new();
@@ -41,20 +37,21 @@ pub fn main() {
         const SCALE_TOLERANCE: f32 = 0.1;
         const POSITION_TOLERANCE: f32 = 0.1;
         let cache = conrod_core::text::GlyphCache::builder()
-            .dimensions(WIDTH, HEIGHT)
+            .dimensions(manager.win_w(), manager.win_h())
             .scale_tolerance(SCALE_TOLERANCE)
             .position_tolerance(POSITION_TOLERANCE)
             .build();
-        let buffer_len = WIDTH as usize * HEIGHT as usize;
+        let buffer_len = manager.win_w() as usize * manager.win_h() as usize;
         let init = vec![128; buffer_len];
         let settings = TextureSettings::new();
         let factory = &mut window.factory;
-        let texture = G2dTexture::from_memory_alpha(factory, &init, WIDTH, HEIGHT, &settings).unwrap();
+        let texture = G2dTexture::from_memory_alpha(factory, &init,
+            manager.win_w(), manager.win_h(), &settings).unwrap();
         (cache, texture)
     };
 
     // Instantiate the generated list of widget identifiers.
-    let gui = conrod_example_shared::Gui::new(&mut ui);
+    let gui = conrod_example_shared::Gui::new(&mut manager);
 
     // Load the rust logo from file to a piston_window texture.
     let rust_logo: G2dTexture = {
@@ -80,16 +77,19 @@ pub fn main() {
         let size = window.size();
         let (win_w, win_h) = (size.width as conrod_core::Scalar, size.height as conrod_core::Scalar);
         if let Some(e) = conrod_piston::event::convert(event.clone(), win_w, win_h) {
-            ui.handle_event(e);
+            if let Some(example) = manager.handle_event(e) {
+                let w = &mut window.window;
+                w.set_title(namer.title(&manager.example()));
+                w.set_size(example.size());
+            }
         }
 
         event.update(|_| {
-            let mut ui = &mut ui.set_widgets();
-            gui.update(&mut ui, &mut app);
+            gui.update_ui(&mut manager, &mut app);
         });
 
         window.draw_2d(&event, |context, graphics| {
-            if let Some(primitives) = ui.draw_if_changed() {
+            if let Some(primitives) = manager.ui().draw_if_changed() {
 
                 // A function used for caching glyphs to the texture cache.
                 let cache_queued_glyphs = |graphics: &mut G2d,

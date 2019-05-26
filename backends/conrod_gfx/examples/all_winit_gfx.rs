@@ -18,7 +18,6 @@ extern crate find_folder;
 extern crate image;
 extern crate winit;
 
-use conrod_example_shared::{WIN_W, WIN_H};
 use gfx::Device;
 
 const CLEAR_COLOR: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
@@ -44,10 +43,13 @@ impl<'a> conrod_winit::WinitWindow for WindowRef<'a> {
 conrod_winit::conversion_fns!();
 
 fn main() {
+    let mut manager = conrod_example_shared::Manager::new();
+    let namer = conrod_example_shared::Namer::new("Conrod with GFX and Glutin");
+
     // Builder for window
     let builder = glutin::WindowBuilder::new()
-        .with_title("Conrod with GFX and Glutin")
-        .with_dimensions((WIN_W, WIN_H).into());
+        .with_title(namer.title(&manager.example()))
+        .with_dimensions((manager.win_w(), manager.win_h()).into());
 
     let context = glutin::ContextBuilder::new()
         .with_multisampling(4);
@@ -62,15 +64,12 @@ fn main() {
     let mut renderer = conrod_gfx::Renderer::new(&mut factory, &rtv, window.get_hidpi_factor() as f64).unwrap();
 
     // Create Ui and Ids of widgets to instantiate
-    let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
-        .theme(conrod_example_shared::theme())
-        .build();
-    let gui = conrod_example_shared::Gui::new(&mut ui);
+    let gui = conrod_example_shared::Gui::new(&mut manager);
 
     // Load font from file
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    ui.fonts.insert_from_file(font_path).unwrap();
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Load the Rust logo from our assets folder to use as an example image.
     fn load_rust_logo<T: gfx::format::TextureFormat,R: gfx_core::Resources, F: gfx::Factory<R>>(factory: &mut F) -> (gfx::handle::ShaderResourceView<R, <T as gfx::format::Formatted>::View>,(u32,u32)) {
@@ -120,7 +119,7 @@ fn main() {
 
         let dpi_factor = window.get_hidpi_factor() as f32;
 
-        if let Some(primitives) = ui.draw_if_changed() {
+        if let Some(primitives) = manager.ui().draw_if_changed() {
             let dims = (win_w as f32 * dpi_factor, win_h as f32 * dpi_factor);
 
             //Clear the window
@@ -140,7 +139,11 @@ fn main() {
 
             // Convert winit event to conrod event, requires conrod to be built with the `winit` feature
             if let Some(event) = convert_event(event.clone(), &WindowRef(window.window())) {
-                ui.handle_event(event);
+                if let Some(example) = manager.handle_event(event) {
+                    let w = window.window();
+                    w.set_title(&namer.title(&manager.example()));
+                    w.set_inner_size(example.size().into());
+                }
             }
 
             // Close window if the escape key or the exit button is pressed
@@ -166,9 +169,8 @@ fn main() {
         }
 
         // Update widgets if any event has happened
-        if ui.global_input().events().next().is_some() {
-            let mut ui = &mut ui.set_widgets();
-            gui.update(&mut ui, &mut app);
+        if manager.ui().global_input().events().next().is_some() {
+            gui.update_ui(&mut manager, &mut app);
         }
     }
 }

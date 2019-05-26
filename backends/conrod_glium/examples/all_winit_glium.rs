@@ -10,16 +10,18 @@ extern crate image;
 
 mod support;
 
-use conrod_example_shared::{WIN_W, WIN_H};
 use conrod_glium::Renderer;
 use glium::Surface;
 
 fn main() {
+    let mut manager = conrod_example_shared::Manager::new();
+    let namer = conrod_example_shared::Namer::new("Conrod with glium!");
+
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title("Conrod with glium!")
-        .with_dimensions((WIN_W, WIN_H).into());
+        .with_title(namer.title(&manager.example()))
+        .with_dimensions((manager.win_w(), manager.win_h()).into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -27,16 +29,12 @@ fn main() {
     let display = support::GliumDisplayWinitWrapper(display);
 
     // Construct our `Ui`.
-    let mut ui = conrod_core::UiBuilder::new([WIN_W as f64, WIN_H as f64])
-        .theme(conrod_example_shared::theme())
-        .build();
-
-    let gui = conrod_example_shared::Gui::new(&mut ui);
+    let gui = conrod_example_shared::Gui::new(&mut manager);
 
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    ui.fonts.insert_from_file(font_path).unwrap();
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Load the Rust logo from our assets folder to use as an example image.
     fn load_rust_logo(display: &glium::Display) -> glium::texture::Texture2d {
@@ -80,7 +78,11 @@ fn main() {
 
             // Use the `winit` backend feature to convert the winit event to a conrod one.
             if let Some(event) = support::convert_event(event.clone(), &display) {
-                ui.handle_event(event);
+                if let Some(example) = manager.handle_event(event) {
+                    let w = display.0.gl_window();
+                    w.set_title(&namer.title(&manager.example()));
+                    w.set_inner_size(example.size().into());
+                }
                 event_loop.needs_update();
             }
 
@@ -102,11 +104,10 @@ fn main() {
         }
 
         // Instantiate a GUI demonstrating every widget type provided by conrod.
-        let mut ui = &mut ui.set_widgets();
-        gui.update(&mut ui, &mut app);
+        gui.update_ui(&mut manager, &mut app);
 
         // Draw the `Ui`.
-        if let Some(primitives) = ui.draw_if_changed() {
+        if let Some(primitives) = manager.ui().draw_if_changed() {
             renderer.fill(&display.0, primitives, &image_map);
             let mut target = display.0.draw();
             target.clear_color(0.0, 0.0, 0.0, 1.0);

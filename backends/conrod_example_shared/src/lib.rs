@@ -21,6 +21,8 @@ mod image;
 mod button_xy_pad_toggle;
 mod number_dialer_plotpath;
 
+pub mod canvas;
+
 mod template; // Not used, but intended as a file to copy-paste new components from
 
 use layout::*;
@@ -37,6 +39,7 @@ use conrod_core::{
 #[derive(Copy, Clone)]
 pub enum Example {
     New,
+    Canvas,
 }
 
 impl Example {
@@ -44,12 +47,14 @@ impl Example {
     pub fn name(&self) -> &'static str {
         match self {
             Example::New => "All Widgets",
+            Example::Canvas => "Canvas",
         }
     }
 
     pub fn size(&self) -> (u32, u32) {
         match self {
             Example::New => (600, 420),
+            Example::Canvas => (800, 600),
         }
     }
 
@@ -61,12 +66,14 @@ impl Example {
     pub fn theme(&self) -> Theme {
         match self {
             Example::New => theme(),
+            Example::Canvas => Theme::default(),
         }
     }
 
     pub fn next(&self) -> Example {
         match self {
-            Example::New => Example::New,
+            Example::New => Example::Canvas,
+            Example::Canvas => Example::New,
         }
     }
 }
@@ -95,6 +102,10 @@ pub struct Manager {
 impl Manager {
     pub fn new() -> Self {
         Self::new_from(Example::New)
+    }
+
+    pub fn canvas() -> Self {
+        Self::new_from(Example::Canvas)
     }
 
     pub fn new_from(example: Example) -> Self {
@@ -220,6 +231,7 @@ pub struct Gui {
     image: image::Gui,
     button_xy_pad_toggle: button_xy_pad_toggle::Gui,
     number_dialer_plotpath: number_dialer_plotpath::Gui,
+    canvas: canvas::Gui,
 }
 
 impl Gui {
@@ -233,6 +245,7 @@ impl Gui {
             image: image::Gui::new(ui),
             button_xy_pad_toggle: button_xy_pad_toggle::Gui::new(ui),
             number_dialer_plotpath: number_dialer_plotpath::Gui::new(ui),
+            canvas: canvas::Gui::new(ui),
         }
     }
 
@@ -251,6 +264,9 @@ impl Gui {
                     .top_left_of(window)
                     .wh_of(window)
                     .set(self.ids.overlay, ui);*/
+            },
+            Example::Canvas => {
+                self.canvas.update(ui);
             },
         }
     }

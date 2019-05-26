@@ -11,6 +11,8 @@
 #![allow(dead_code)]
 
 mod crop_kids;
+mod list;
+mod nested_canvas;
 
 #[macro_use] extern crate conrod_core;
 extern crate rand;
@@ -204,6 +206,7 @@ pub struct DemoApp {
     rust_logo: conrod_core::image::Id,
     old_demo: old_demo::DemoApp,
     crop_kids: crop_kids::GuiState,
+    list: list::GuiState,
 }
 
 
@@ -219,6 +222,7 @@ impl DemoApp {
                 running: true,
                 message: String::from("Edit this Text Area..."),
             },
+            list: list::GuiState { list: vec![true; 16] },
         }
     }
 }
@@ -245,6 +249,8 @@ pub struct Gui {
     canvas: canvas::Gui,
     old_demo: old_demo::Gui,
     crop_kids: crop_kids::Gui,
+    list: list::Gui,
+    nested_canvas: nested_canvas::Gui,
 }
 
 impl Gui {
@@ -261,6 +267,8 @@ impl Gui {
             canvas: canvas::Gui::new(ui),
             old_demo: old_demo::Gui::new(ui),
             crop_kids: crop_kids::Gui::new(ui),
+            list: list::Gui::new(ui),
+            nested_canvas: nested_canvas::Gui::new(ui),
         }
     }
 
@@ -313,6 +321,10 @@ impl Gui {
         
         let space = rect.y.end - rect.y.start + side * 0.5 + MARGIN;
         self.number_dialer_plotpath.update(ui, &mut app.sine_frequency, canvas, last, space);
+
+        self.list.update(ui, &mut app.list);
+
+        self.nested_canvas.update(ui);
 
         /////////////////////
         ///// Scrollbar /////

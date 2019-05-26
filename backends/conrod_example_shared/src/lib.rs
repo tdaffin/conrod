@@ -10,6 +10,8 @@
 //! and drawing backends behave in the same manner.
 #![allow(dead_code)]
 
+mod crop_kids;
+
 #[macro_use] extern crate conrod_core;
 extern crate rand;
 extern crate input;
@@ -201,6 +203,7 @@ pub struct DemoApp {
     sine_frequency: f32,
     rust_logo: conrod_core::image::Id,
     old_demo: old_demo::DemoApp,
+    crop_kids: crop_kids::GuiState,
 }
 
 
@@ -212,6 +215,10 @@ impl DemoApp {
             sine_frequency: 1.0,
             rust_logo: rust_logo,
             old_demo: old_demo::DemoApp::new(),
+            crop_kids: crop_kids::GuiState {
+                running: true,
+                message: String::from("Edit this Text Area..."),
+            },
         }
     }
 }
@@ -237,6 +244,7 @@ pub struct Gui {
     number_dialer_plotpath: number_dialer_plotpath::Gui,
     canvas: canvas::Gui,
     old_demo: old_demo::Gui,
+    crop_kids: crop_kids::Gui,
 }
 
 impl Gui {
@@ -252,6 +260,7 @@ impl Gui {
             number_dialer_plotpath: number_dialer_plotpath::Gui::new(ui),
             canvas: canvas::Gui::new(ui),
             old_demo: old_demo::Gui::new(ui),
+            crop_kids: crop_kids::Gui::new(ui),
         }
     }
 
@@ -310,6 +319,9 @@ impl Gui {
         /////////////////////
 
         widget::Scrollbar::y_axis(canvas).auto_hide(true).set(ids.canvas_scrollbar, ui);
+
+        // Add after the scrollbar as it is draggable and will interfere with the scroll if inside it
+        self.crop_kids.update(ui, &mut app.crop_kids);
     }
 
 }

@@ -21,6 +21,8 @@ mod image;
 mod button_xy_pad_toggle;
 mod number_dialer_plotpath;
 
+mod template; // Not used, but intended as a file to copy-paste new components from
+
 use layout::*;
 
 use conrod_core::{

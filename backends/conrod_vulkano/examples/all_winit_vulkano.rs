@@ -247,18 +247,12 @@ fn main() {
 }
 
 pub struct RenderTarget {
-    depth_buffer: Arc<AttachmentImage<D16Unorm>>,
     render_pass: Arc<RenderPassAbstract + Send + Sync>,
     framebuffers: Vec<Arc<FramebufferAbstract + Send + Sync>>,
 }
 
 impl RenderTarget {
     pub fn new(window: &support::Window) -> Self {
-        let (win_w, win_h) = window.get_dimensions().expect("couldn't get window dimensions");
-        let win_dims = [win_w, win_h];
-        let device = window.device.clone();
-        let depth_buffer = AttachmentImage::transient(device, win_dims, DEPTH_FORMAT_TY).unwrap();
-
         let render_pass = Arc::new(
             single_pass_renderpass!(window.device.clone(),
                 attachments: {
@@ -283,10 +277,9 @@ impl RenderTarget {
             .unwrap(),
         );
 
-        let framebuffers = create_framebuffers(window, render_pass.clone(), depth_buffer.clone());
+        let framebuffers = create_framebuffers(window, render_pass.clone());
 
         RenderTarget {
-            depth_buffer,
             framebuffers,
             render_pass,
         }
@@ -295,15 +288,10 @@ impl RenderTarget {
     pub fn handle_resize(&mut self, window: &support::Window) {
         let [fb_w, fb_h, _] = self.framebuffers[0].dimensions();
         let (win_w, win_h) = window.get_dimensions().expect("couldn't get window dimensions");
-        let win_dims = [win_w, win_h];
-        let device = window.device.clone();
-        if fb_w != win_w || fb_h != win_h {
-            self.depth_buffer = AttachmentImage::transient(device, win_dims, DEPTH_FORMAT_TY)
-                .unwrap();
+        if fb_w != win_w || fb_h != win_h {           
             self.framebuffers = create_framebuffers(
                 window,
                 self.render_pass.clone(),
-                self.depth_buffer.clone(),
             );
         }
     }
@@ -312,20 +300,25 @@ impl RenderTarget {
 fn create_framebuffers(
     window: &support::Window,
     render_pass: Arc<RenderPassAbstract + Send + Sync>,
-    depth_buffer: Arc<AttachmentImage<D16Unorm>>,
 ) -> Vec<Arc<FramebufferAbstract + Send + Sync>> {
     window
         .images
         .iter()
         .map(|image| {
+            let image = image.clone();
+            let depth_buffer = AttachmentImage::transient(
+                window.device.clone(),
+                image.dimensions(),
+                DEPTH_FORMAT_TY
+            ).expect("Couldn't create depth buffer");
             Arc::new(
                 Framebuffer::start(render_pass.clone())
-                    .add(image.clone())
-                    .unwrap()
-                    .add(depth_buffer.clone())
-                    .unwrap()
+                    .add(image)
+                    .expect("Couldn't add image")
+                    .add(depth_buffer)
+                    .expect("Couldn't add depth buffer")
                     .build()
-                    .unwrap(),
+                    .expect("Couldn't build frame buffer"),
             ) as Arc<_>
         })
         .collect()

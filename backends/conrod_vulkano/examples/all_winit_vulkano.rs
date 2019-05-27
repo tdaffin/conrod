@@ -301,6 +301,9 @@ fn create_framebuffers(
     window: &support::Window,
     render_pass: Arc<RenderPassAbstract + Send + Sync>,
 ) -> Vec<Arc<FramebufferAbstract + Send + Sync>> {
+    let (win_w, win_h) = window.get_dimensions().expect("couldn't get window dimensions");
+    let win_dims = [win_w, win_h];
+
     window
         .images
         .iter()

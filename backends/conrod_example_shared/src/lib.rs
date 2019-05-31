@@ -22,6 +22,7 @@ mod button_xy_pad_toggle;
 mod number_dialer_plotpath;
 
 pub mod canvas;
+pub mod old_demo;
 
 mod template; // Not used, but intended as a file to copy-paste new components from
 
@@ -40,6 +41,7 @@ use conrod_core::{
 pub enum Example {
     New,
     Canvas,
+    OldDemo,
 }
 
 impl Example {
@@ -48,6 +50,7 @@ impl Example {
         match self {
             Example::New => "All Widgets",
             Example::Canvas => "Canvas",
+            Example::OldDemo => "Widget Demonstration",
         }
     }
 
@@ -55,6 +58,7 @@ impl Example {
         match self {
             Example::New => (600, 420),
             Example::Canvas => (800, 600),
+            Example::OldDemo => (1100, 560),
         }
     }
 
@@ -67,13 +71,15 @@ impl Example {
         match self {
             Example::New => theme(),
             Example::Canvas => Theme::default(),
+            Example::OldDemo => Theme::default(),
         }
     }
 
     pub fn next(&self) -> Example {
         match self {
             Example::New => Example::Canvas,
-            Example::Canvas => Example::New,
+            Example::Canvas => Example::OldDemo,
+            Example::OldDemo => Example::New,
         }
     }
 }
@@ -198,6 +204,7 @@ pub struct DemoApp {
     button_xy_pad_toggle: button_xy_pad_toggle::GuiState,
     sine_frequency: f32,
     rust_logo: conrod_core::image::Id,
+    old_demo: old_demo::DemoApp,
 }
 
 
@@ -208,6 +215,7 @@ impl DemoApp {
             button_xy_pad_toggle: button_xy_pad_toggle::GuiState::new(),
             sine_frequency: 1.0,
             rust_logo: rust_logo,
+            old_demo: old_demo::DemoApp::new(),
         }
     }
 }
@@ -232,6 +240,7 @@ pub struct Gui {
     button_xy_pad_toggle: button_xy_pad_toggle::Gui,
     number_dialer_plotpath: number_dialer_plotpath::Gui,
     canvas: canvas::Gui,
+    old_demo: old_demo::Gui,
 }
 
 impl Gui {
@@ -246,6 +255,7 @@ impl Gui {
             button_xy_pad_toggle: button_xy_pad_toggle::Gui::new(ui),
             number_dialer_plotpath: number_dialer_plotpath::Gui::new(ui),
             canvas: canvas::Gui::new(ui),
+            old_demo: old_demo::Gui::new(ui),
         }
     }
 
@@ -267,6 +277,9 @@ impl Gui {
             },
             Example::Canvas => {
                 self.canvas.update(ui);
+            },
+            Example::OldDemo => {
+                self.old_demo.update(ui, &mut app.old_demo);
             },
         }
     }

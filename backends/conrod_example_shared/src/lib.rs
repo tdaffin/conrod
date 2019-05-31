@@ -110,10 +110,6 @@ impl Manager {
         Self::new_from(Example::New)
     }
 
-    pub fn canvas() -> Self {
-        Self::new_from(Example::Canvas)
-    }
-
     pub fn new_from(example: Example) -> Self {
         Self {
             example,

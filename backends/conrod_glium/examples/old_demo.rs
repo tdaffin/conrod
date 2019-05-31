@@ -25,7 +25,7 @@ fn main() {
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title("Widget Demonstration")
+        .with_title(example.name())
         .with_dimensions(example.size().into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)

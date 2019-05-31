@@ -1,0 +1,19 @@
+all_winit_gfx  make window too large
+
+thread 'main' panicked at 'attempt to add with overflow', /home/tom/.cargo/registry/src/github.com-1ecc6299db9ec823/gfx_device_gl-0.15.5/src/command.rs:518:42
+
+
+// inverting the Y axis in order to match D3D11
+               y: cmp::max(target_dim.1, rect.y + rect.h) -
+                   rect.y -
+                   rect.h,
+               ..rect
+
+
+
+all_winit_vulkano resize window rapidly
+
+thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: AttachmentDimensionsIncompatible { expected: [1542, 913, 1], obtained: [1563, 949, 1] }', src/libcore/result.rs:997:5
+
+thread 'main' panicked at 'Could not add depth buffer: AttachmentDimensionsIncompatible { expected: [1032, 725, 1], obtained: [1115, 759, 1] }', src/libcore/result.rs:997:5
+

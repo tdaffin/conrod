@@ -20,19 +20,34 @@ widget_ids! {
     }
 }
 
+pub struct GuiState {
+    sine_frequency: f32,
+}
+
+impl GuiState {
+    pub fn new() -> Self {
+        Self {
+            sine_frequency: 1.0,
+        }
+    }
+}
+
 pub struct Gui {
     ids: Ids,
+    state: GuiState,
 }
 
 impl Gui {
     pub fn new(ui: &mut Ui) -> Self {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
+            state: GuiState::new(),
         }
     }
 
     /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, sine_frequency: &mut f32, canvas: widget::Id, last: widget::Id, space: Scalar) -> widget::Id {
+    pub fn update(&mut self, ui: &mut UiCell, canvas: widget::Id, last: widget::Id, space: Scalar) -> widget::Id {
+        let state = &mut self.state;
         let ids = &self.ids;
 
         widget::Text::new("NumberDialer and PlotPath")
@@ -45,19 +60,19 @@ impl Gui {
         let min = 0.5;
         let max = 200.0;
         let decimal_precision = 1;
-        for new_freq in widget::NumberDialer::new(*sine_frequency, min, max, decimal_precision)
+        for new_freq in widget::NumberDialer::new(state.sine_frequency, min, max, decimal_precision)
             .down(60.0)
             .align_middle_x_of(canvas)
             .w_h(160.0, 40.0)
             .label("F R E Q")
             .set(ids.number_dialer, ui)
         {
-            *sine_frequency = new_freq;
+            state.sine_frequency = new_freq;
         }
 
         // Use the `PlotPath` widget to display a sine wave.
         let min_x = 0.0;
-        let max_x = std::f32::consts::PI * 2.0 * *sine_frequency;
+        let max_x = std::f32::consts::PI * 2.0 * state.sine_frequency;
         let min_y = -1.0;
         let max_y = 1.0;
         widget::PlotPath::new(min_x, max_x, min_y, max_y, f32::sin)

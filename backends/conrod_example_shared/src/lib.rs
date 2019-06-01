@@ -201,7 +201,6 @@ fn theme() -> conrod_core::Theme {
 
 /// A demonstration of some application state we want to control with a conrod GUI.
 pub struct DemoApp {
-    sine_frequency: f32,
     rust_logo: conrod_core::image::Id,
     old_demo: old_demo::DemoApp,
 }
@@ -211,7 +210,6 @@ impl DemoApp {
     /// Simple constructor for the `DemoApp`.
     pub fn new(rust_logo: conrod_core::image::Id) -> Self {
         DemoApp {
-            sine_frequency: 1.0,
             rust_logo: rust_logo,
             old_demo: old_demo::DemoApp::new(),
         }
@@ -314,7 +312,7 @@ impl Gui {
         last = self.button_xy_pad_toggle.update(ui, canvas, last, &rect, side);
         
         let space = rect.y.end - rect.y.start + side * 0.5 + MARGIN;
-        self.number_dialer_plotpath.update(ui, &mut app.sine_frequency, canvas, last, space);
+        self.number_dialer_plotpath.update(ui, canvas, last, space);
 
         self.list.update(ui);
 

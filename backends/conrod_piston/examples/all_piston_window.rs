@@ -50,9 +50,6 @@ pub fn main() {
         (cache, texture)
     };
 
-    // Instantiate the generated list of widget identifiers.
-    let gui = conrod_example_shared::Gui::new(&mut manager);
-
     // Load the rust logo from file to a piston_window texture.
     let rust_logo: G2dTexture = {
         let assets = find_folder::Search::ParentsThenKids(5, 3).for_folder("assets").unwrap();
@@ -68,7 +65,9 @@ pub fn main() {
     let rust_logo = image_map.insert(rust_logo);
 
     // A demonstration of some state that we'd like to control with the App.
-    let mut app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    // Instantiate the generated list of widget identifiers.
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
 
     // Poll events from the window.
     while let Some(event) = window.next() {
@@ -85,7 +84,7 @@ pub fn main() {
         }
 
         event.update(|_| {
-            gui.update_ui(&mut manager, &mut app);
+            gui.update_ui(&mut manager);
         });
 
         window.draw_2d(&event, |context, graphics| {

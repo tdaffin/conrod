@@ -251,10 +251,11 @@ pub struct Gui {
     crop_kids: crop_kids::Gui,
     list: list::Gui,
     nested_canvas: nested_canvas::Gui,
+    state: DemoApp,
 }
 
 impl Gui {
-    pub fn new(manager: &mut Manager) -> Self {
+    pub fn new(manager: &mut Manager, state: DemoApp) -> Self {
         manager.update_theme();
         let ui = manager.ui();
         Self {
@@ -269,16 +270,17 @@ impl Gui {
             crop_kids: crop_kids::Gui::new(ui),
             list: list::Gui::new(ui),
             nested_canvas: nested_canvas::Gui::new(ui),
+            state,
         }
     }
 
     /// Instantiate a GUI demonstrating every widget available in conrod.
-    pub fn update_ui(&self, manager: &mut Manager, app: &mut DemoApp) {
+    pub fn update_ui(&mut self, manager: &mut Manager) {
         //manager.update_theme();
         let ui = &mut manager.ui().set_widgets();
         match manager.example {
             Example::New => {
-                self.update_new(ui, app);
+                self.update_new(ui);
 
                 // Transparent overlay canvas, the size of the window
                 /*
@@ -292,12 +294,13 @@ impl Gui {
                 self.canvas.update(ui);
             },
             Example::OldDemo => {
-                self.old_demo.update(ui, &mut app.old_demo);
+                self.old_demo.update(ui, &mut self.state.old_demo);
             },
         }
     }
 
-    fn update_new(&self, ui: &mut UiCell, app: &mut DemoApp){
+    fn update_new(&mut self, ui: &mut UiCell){
+        let app = &mut self.state;
         let ids = &self.ids;
         let canvas = self.ids.canvas;
 

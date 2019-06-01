@@ -78,10 +78,10 @@ fn main() {
         manager.ui().fonts.insert_from_file(font_path).unwrap();
 
         // A demonstration of some app state that we want to control with the conrod GUI.
-        let mut app = conrod_example_shared::DemoApp::new(rust_logo);
+        let app = conrod_example_shared::DemoApp::new(rust_logo);
 
         // The `widget::Id` of each widget instantiated in `conrod_example_shared::gui`.
-        let gui = conrod_example_shared::Gui::new(&mut manager);
+        let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
 
         // Many widgets require another frame to finish drawing after clicks or hovers, so we
         // insert an update into the conrod loop using this `bool` after each event.
@@ -116,7 +116,7 @@ fn main() {
             }
 
             // Instantiate a GUI demonstrating every widget type provided by conrod.
-            gui.update_ui(&mut manager, &mut app);
+            gui.update_ui(&mut manager);
 
             // Render the `Ui` to a list of primitives that we can send to the main thread for
             // display. Wakeup `winit` for rendering.

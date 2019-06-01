@@ -28,9 +28,6 @@ fn main() {
     let display = glium::Display::new(window, context, &events_loop).unwrap();
     let display = support::GliumDisplayWinitWrapper(display);
 
-    // Construct our `Ui`.
-    let gui = conrod_example_shared::Gui::new(&mut manager);
-
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
@@ -51,7 +48,9 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo(&display.0));
 
     // A demonstration of some app state that we want to control with the conrod GUI.
-    let mut app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    // Construct our `Ui`.
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
 
     // A type used for converting `conrod_core::render::Primitives` into `Command`s that can be used
     // for drawing to the glium `Surface`.
@@ -104,7 +103,7 @@ fn main() {
         }
 
         // Instantiate a GUI demonstrating every widget type provided by conrod.
-        gui.update_ui(&mut manager, &mut app);
+        gui.update_ui(&mut manager);
 
         // Draw the `Ui`.
         if let Some(primitives) = manager.ui().draw_if_changed() {

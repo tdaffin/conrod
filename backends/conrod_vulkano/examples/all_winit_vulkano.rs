@@ -56,9 +56,6 @@ fn main() {
         window.surface.window().get_hidpi_factor() as f64,
     ).unwrap();
 
-    // Create Ui and Ids of widgets to instantiate
-    let gui = conrod_example_shared::Gui::new(&mut manager);
-
     // Load font from file
     let assets = find_folder::Search::KidsThenParents(3, 5)
         .for_folder("assets")
@@ -93,7 +90,9 @@ fn main() {
     let rust_logo = image_map.insert(logo);
 
     // Demonstration app state that we'll control with our conrod GUI.
-    let mut app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    // Create Ui and Ids of widgets to instantiate
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
 
     // Keep track of the previous frame so we can wait for it to complete before presenting a new
     // one. This should make sure the CPU never gets ahead of the presentation of frames, which can
@@ -241,7 +240,7 @@ fn main() {
 
         // Update widgets if any event has happened
         if manager.ui().global_input().events().next().is_some() {
-            gui.update_ui(&mut manager, &mut app);
+            gui.update_ui(&mut manager);
         }
     }
 }

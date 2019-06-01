@@ -63,9 +63,6 @@ fn main() {
 
     let mut renderer = conrod_gfx::Renderer::new(&mut factory, &rtv, window.get_hidpi_factor() as f64).unwrap();
 
-    // Create Ui and Ids of widgets to instantiate
-    let gui = conrod_example_shared::Gui::new(&mut manager);
-
     // Load font from file
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
@@ -107,7 +104,9 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo::<conrod_gfx::ColorFormat,_,_>(&mut factory));
 
     // Demonstration app state that we'll control with our conrod GUI.
-    let mut app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    // Create Ui and Ids of widgets to instantiate
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
 
     'main: loop {
         // If the window is closed, this will be None for one tick, so to avoid panicking with
@@ -170,7 +169,7 @@ fn main() {
 
         // Update widgets if any event has happened
         if manager.ui().global_input().events().next().is_some() {
-            gui.update_ui(&mut manager, &mut app);
+            gui.update_ui(&mut manager);
         }
     }
 }

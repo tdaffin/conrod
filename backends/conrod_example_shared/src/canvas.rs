@@ -10,8 +10,7 @@ use conrod_core::{
     color,
     widget,
 };
-
-use super::Component;
+use super::{Component, Env};
 
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {
@@ -54,11 +53,16 @@ impl Gui {
             ids: Ids::new(ui.widget_id_generator()),
         }
     }
+
+    pub fn set_widgets(&mut self, ui: &mut UiCell) {
+        let env = Env::new(ui);
+        self.update(ui, &env);
+    }
 }
 
 impl Component for Gui {
 
-    fn update(&mut self, ui: &mut UiCell) {
+    fn update(&mut self, ui: &mut UiCell, _env: &Env) {
         let ids = &self.ids;
 
         // Construct our main `Canvas` tree.

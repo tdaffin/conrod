@@ -10,8 +10,7 @@ use conrod_core::{
     color,
     widget,
 };
-
-use super::Component;
+use super::{Component, Env};
 
 /// This struct holds all of the variables used to demonstrate application data being passed
 /// through the widgets. If some of these seem strange, that's because they are! Most of these
@@ -135,16 +134,21 @@ impl Gui {
             app: DemoApp::new(),
         }
     }
-}
 
-impl Component for Gui {
     /// Set all `Widget`s within the User Interface.
     ///
     /// The first time this gets called, each `Widget`'s `State` will be initialised and cached within
     /// the `Ui` at their given indices. Every other time this get called, the `Widget`s will avoid any
     /// allocations by updating the pre-existing cached state. A new graphical `Element` is only
     /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
-    fn update(&mut self, ui: &mut UiCell) {
+    pub fn set_widgets(&mut self, ui: &mut UiCell) {
+        let env = Env::new(ui);
+        self.update(ui, &env);
+    }
+}
+
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, _env: &Env) {
         let app = &mut self.app;
         let ids = &self.ids;
 

@@ -18,7 +18,6 @@ extern crate rand; // for making a random color.
 mod support;
 
 use glium::Surface;
-use conrod_example_shared::Component;
 
 fn main() {
     let example = conrod_example_shared::Example::OldDemo;
@@ -83,7 +82,7 @@ fn main() {
         }
 
         // We'll set all our widgets in a single function called `set_widgets`.
-        gui.update(&mut ui.set_widgets());
+        gui.set_widgets(&mut ui.set_widgets());
 
         // Render the `Ui` and then display it on the screen.
         if let Some(primitives) = ui.draw_if_changed() {

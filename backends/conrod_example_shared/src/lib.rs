@@ -33,7 +33,6 @@ mod template; // Not used, but intended as a file to copy-paste new components f
 use layout::*;
 
 use conrod_core::{
-    Rect,
     Theme,
     Ui,
     UiCell,
@@ -176,6 +175,32 @@ impl Manager {
     }
 }
 
+/// The environment of a Component
+pub struct Env {
+    canvas: widget::Id,
+    last: widget::Id,
+}
+
+impl Env {
+    fn new(ui: &Ui) -> Self {
+        Self {
+            canvas: ui.window,
+            last: ui.window,
+        }
+    }
+
+    fn set_canvas(&mut self, canvas: widget::Id) {
+        self.canvas = canvas;
+    }
+    fn set_last(&mut self, last: widget::Id) {
+        self.last = last;
+    }
+
+    fn get(&self) -> (widget::Id, widget::Id) {
+        (self.canvas, self.last)
+    }
+}
+
 /// A component that contains widgets that may mutate its state
 pub trait Component {
 
@@ -185,13 +210,10 @@ pub trait Component {
     /// the `Ui` at their given indices. Every other time this get called, the `Widget`s will avoid any
     /// allocations by updating the pre-existing cached state. A new graphical `Element` is only
     /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
-    fn update(&mut self, ui: &mut UiCell);
-
-    fn set_canvas(&mut self, _canvas: widget::Id) {}
-    fn set_last(&mut self, _last: widget::Id) {}
+    fn update(&mut self, ui: &mut UiCell, env: &Env);
 
     /// Returns id of widget that the next Component should be down_from
-    fn get_bottom(&mut self) -> Option<widget::Id> { None }
+    fn get_bottom(&self) -> Option<widget::Id> { None }
 }
 
 /// A set of reasonable stylistic defaults that works for the `gui` below.
@@ -231,16 +253,10 @@ widget_ids! {
 
 pub struct Gui {
     ids: Ids,
-    text: text::Gui,
-    shapes: shapes::Gui,
-    image: image::Gui,
-    button_xy_pad_toggle: button_xy_pad_toggle::Gui,
-    number_dialer_plotpath: number_dialer_plotpath::Gui,
+    components: Vec<Box<Component>>,
+    crop_kids: crop_kids::Gui,
     canvas: canvas::Gui,
     old_demo: old_demo::Gui,
-    crop_kids: crop_kids::Gui,
-    list: list::Gui,
-    nested_canvas: nested_canvas::Gui,
 }
 
 impl Gui {
@@ -249,16 +265,18 @@ impl Gui {
         let ui = manager.ui();
         Self {
             ids: Ids::new(ui.widget_id_generator()),
-            text: text::Gui::new(ui),
-            shapes: shapes::Gui::new(ui),
-            image: image::Gui::new(ui, rust_logo),
-            button_xy_pad_toggle: button_xy_pad_toggle::Gui::new(ui),
-            number_dialer_plotpath: number_dialer_plotpath::Gui::new(ui),
+            components: vec![
+                Box::new(text::Gui::new(ui)),
+                Box::new(shapes::Gui::new(ui)),
+                Box::new(image::Gui::new(ui, rust_logo)),
+                Box::new(button_xy_pad_toggle::Gui::new(ui)),
+                Box::new(number_dialer_plotpath::Gui::new(ui)),
+                Box::new(list::Gui::new(ui)),
+                Box::new(nested_canvas::Gui::new(ui)),
+            ],
+            crop_kids: crop_kids::Gui::new(ui),
             canvas: canvas::Gui::new(ui),
             old_demo: old_demo::Gui::new(ui),
-            crop_kids: crop_kids::Gui::new(ui),
-            list: list::Gui::new(ui),
-            nested_canvas: nested_canvas::Gui::new(ui),
         }
     }
 
@@ -266,6 +284,7 @@ impl Gui {
     pub fn update_ui(&mut self, manager: &mut Manager) {
         //manager.update_theme();
         let ui = &mut manager.ui().set_widgets();
+        let env = Env::new(ui);
         match manager.example {
             Example::New => {
                 self.update_new(ui);
@@ -279,10 +298,10 @@ impl Gui {
                     .set(self.ids.overlay, ui);*/
             },
             Example::Canvas => {
-                self.canvas.update(ui);
+                self.canvas.update(ui, &env);
             },
             Example::OldDemo => {
-                self.old_demo.update(ui);
+                self.old_demo.update(ui, &env);
             },
         }
     }
@@ -290,40 +309,27 @@ impl Gui {
     fn update_new(&mut self, ui: &mut UiCell){
         let ids = &self.ids;
         let canvas = self.ids.canvas;
+        let mut env = Env::new(ui);
+        env.set_canvas(canvas);
 
         // `Canvas` is a widget that provides some basic functionality for laying out children widgets.
         // By default, its size is the size of the window. We'll use this as a background for the
         // following widgets, as well as a scrollable container for the children widgets.
         widget::Canvas::new().pad(MARGIN).scroll_kids_vertically().set(canvas, ui);
 
-        let mut last = self.text.update(ui, canvas);
+        for component in self.components.iter_mut() {
+            component.update(ui, &env);
+            if let Some(last) = component.get_bottom() {
+                env.set_last(last);
+            }
+        }
 
-        last = self.shapes.update(ui, canvas, last);
-
-        last = self.image.update(ui, canvas, last);
-
-        let ball_x_range = ui.kid_area_of(canvas).unwrap().w();
-        let ball_y_range = ui.h_of(ui.window).unwrap() * 0.5;
-        let rect = Rect::from_xy_dim([0.0, 0.0], [ball_x_range * 2.0 / 3.0, ball_y_range * 2.0 / 3.0]);
-        let side = 130.0;
-        
-        last = self.button_xy_pad_toggle.update(ui, canvas, last, &rect, side);
-        
-        let space = rect.y.end - rect.y.start + side * 0.5 + MARGIN;
-        self.number_dialer_plotpath.update(ui, canvas, last, space);
-
-        self.list.update(ui);
-
-        self.nested_canvas.update(ui);
-
-        /////////////////////
-        ///// Scrollbar /////
-        /////////////////////
-
+        // Close the scrollable region
         widget::Scrollbar::y_axis(canvas).auto_hide(true).set(ids.canvas_scrollbar, ui);
 
         // Add after the scrollbar as it is draggable and will interfere with the scroll if inside it
-        self.crop_kids.update(ui);
+        env.set_last(canvas);
+        self.crop_kids.update(ui, &env);
     }
 
 }

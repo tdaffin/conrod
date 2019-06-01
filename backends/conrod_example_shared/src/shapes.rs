@@ -8,7 +8,7 @@ use conrod_core::{
     UiCell,
     widget,
 };
-
+use super::{Component, Env};
 use layout::*;
 
 widget_ids! {
@@ -39,12 +39,14 @@ impl Gui {
             ids: Ids::new(ui.widget_id_generator()),
         }
     }
+}
 
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, canvas: widget::Id, last: widget::Id) -> widget::Id {
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, env: &Env) {
         use std::iter::once;
 
         let ids = &self.ids;
+        let (canvas, last) = env.get();
 
         widget::Text::new("Lines and Shapes")
             .down_from(last, 70.0)
@@ -104,7 +106,10 @@ impl Gui {
         widget::Oval::outline([80.0, 40.0]).right(SHAPE_GAP + 20.0).align_middle_y().set(ids.oval_outline, ui);
 
         widget::Circle::fill(40.0).right(SHAPE_GAP).align_middle_y().set(ids.circle, ui);
+    }
 
-        ids.shapes_canvas // Return id of widget that the next Gui should be down_from
+    fn get_bottom(&self) -> Option<widget::Id> {
+        // Return id of widget that the next Gui should be down_from
+        Some(self.ids.shapes_canvas)
     }
 }

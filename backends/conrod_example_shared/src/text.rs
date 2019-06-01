@@ -6,7 +6,7 @@ use conrod_core::{
     Widget,
     widget,
 };
-
+use super::{Component, Env};
 use layout::*;
 
 widget_ids! {
@@ -26,10 +26,12 @@ impl Gui {
             ids: Ids::new(ui.widget_id_generator()),
         }
     }
+}
 
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, canvas: widget::Id) -> widget::Id {
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, env: &Env) {
         let ids = &self.ids;
+        let (canvas, _last) = env.get();
 
         // We'll demonstrate the `Text` primitive widget by using it to draw a title and an
         // introduction to the example.
@@ -50,7 +52,10 @@ impl Gui {
             .center_justify()
             .line_spacing(5.0)
             .set(ids.introduction, ui);
+    }
 
-        ids.introduction // Return id of widget that the next Gui should be down_from
+    fn get_bottom(&self) -> Option<widget::Id> {
+        // Return id of widget that the next Gui should be down_from
+        Some(self.ids.introduction)
     }
 }

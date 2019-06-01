@@ -10,6 +10,7 @@ use conrod_core::{
     UiCell,
     widget,
 };
+use super::{Component, Env};
 
 widget_ids! {
     pub struct Ids {
@@ -29,8 +30,10 @@ impl Gui {
             ids: Ids::new(ui.widget_id_generator()),
         }
     }
+}
 
-    pub fn update(&self, ui: &mut UiCell) {
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, _env: &Env) {
         let ids = &self.ids;
 
         // Nest a canvas in the scroll region to illustrate a bug

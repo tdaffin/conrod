@@ -9,7 +9,6 @@ extern crate glium;
 extern crate image;
 
 use glium::Surface;
-use conrod_example_shared::Component;
 
 mod support;
 
@@ -76,7 +75,7 @@ fn main() {
         }
 
         // Instantiate all widgets in the GUI.
-        gui.update(&mut ui.set_widgets());
+        gui.set_widgets(&mut ui.set_widgets());
 
         // Render the `Ui` and then display it on the screen.
         if let Some(primitives) = ui.draw_if_changed() {

@@ -6,7 +6,7 @@ use conrod_core::{
     Widget,
     widget,
 };
-
+use super::{Component, Env};
 use layout::*;
 
 widget_ids! {
@@ -32,10 +32,12 @@ impl Gui {
             state: GuiState { rust_logo },
         }
     }
+}
 
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&mut self, ui: &mut UiCell, canvas: widget::Id, last: widget::Id) -> widget::Id {
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, env: &Env) {
         let ids = &self.ids;
+        let (canvas, last) = env.get();
 
         widget::Text::new("Image")
             .down_from(last, MARGIN)
@@ -49,7 +51,10 @@ impl Gui {
             .down(60.0)
             .align_middle_x_of(canvas)
             .set(ids.rust_logo, ui);
+    }
 
-        ids.rust_logo // Return id of widget that the next Gui should be down_from
+    fn get_bottom(&self) -> Option<widget::Id> {
+        // Return id of widget that the next Gui should be down_from
+        Some(self.ids.rust_logo)
     }
 }

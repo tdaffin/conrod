@@ -4,13 +4,12 @@ use conrod_core::{
     Widget,
     Labelable,
     Positionable,
-    Rect,
     Sizeable,
     Ui,
     UiCell,
     widget,
 };
-
+use super::{Component, Env};
 use layout::*;
 
 widget_ids! {
@@ -49,11 +48,16 @@ impl Gui {
             state: GuiState::new(),
         }
     }
+}
 
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&mut self, ui: &mut UiCell, canvas: widget::Id, last: widget::Id, rect: &Rect, side: f64) -> widget::Id {
+impl Component for Gui {
+
+    fn update(&mut self, ui: &mut UiCell, env: &Env) {
         let state = &mut self.state;
         let ids = &self.ids;
+
+        let (canvas, last) = env.get();
+        let (rect, side) = get_rect_side(ui, canvas);
 
         widget::Text::new("Button, XYPad and Toggle")
             .down_from(last, 60.0)
@@ -103,7 +107,10 @@ impl Gui {
             .color(state.ball_color)
             .x_y_relative_to(ids.xy_pad, ball_x, ball_y)
             .set(ids.ball, ui);
+    }
 
-        ids.xy_pad // Return id of widget that the next Gui should be down_from
+    fn get_bottom(&self) -> Option<widget::Id> {
+        // Return id of widget that the next Gui should be down_from
+        Some(self.ids.xy_pad)
     }
 }

@@ -9,6 +9,7 @@ use conrod_core::{
     UiCell,
     widget,
 };
+use super::{Component, Env};
 
 widget_ids! {
     pub struct Ids {
@@ -38,8 +39,10 @@ impl Gui {
             },
         }
     }
+}
 
-    pub fn update(&mut self, ui: &mut UiCell) {
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, _env: &Env) {
         let state = &mut self.state;
         if !state.running {
             return;

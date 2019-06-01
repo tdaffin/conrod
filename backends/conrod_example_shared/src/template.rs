@@ -10,7 +10,7 @@ use conrod_core::{
     color,
     widget,
 };
-
+use super::{Component, Env};
 use layout::*;
 
 // Generate a unique `WidgetId` for each widget.
@@ -34,28 +34,35 @@ impl GuiState {
 
 pub struct Gui {
     ids: Ids,
+    state: GuiState,
 }
 
 impl Gui {
     pub fn new(ui: &mut Ui) -> Self {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
+            state: GuiState::new(),
         }
     }
+}
 
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, state: &mut GuiState, canvas: widget::Id, last: widget::Id) -> widget::Id {
+impl Component for Gui {
+    fn update(&mut self, ui: &mut UiCell, env: &Env) {
         let ids = &self.ids;
+        let (canvas, last) = env.get();
 
         widget::Canvas::new()
             .down_from(last, MARGIN)
             .align_middle_x_of(canvas)
             .kid_area_w_of(canvas)
             .h(100.0)
-            .color(state.color)
+            .color(self.state.color)
             .pad(MARGIN)
             .set(ids.canvas, ui);
+    }
 
-        ids.canvas // Return id of widget that the next Gui should be down_from
+    fn get_bottom(&self) -> Option<widget::Id> {
+        // Return id of widget that the next Gui should be down_from
+        Some(self.ids.canvas)
     }
 }

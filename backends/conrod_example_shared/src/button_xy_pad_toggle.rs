@@ -39,17 +39,20 @@ impl GuiState {
 
 pub struct Gui {
     ids: Ids,
+    state: GuiState,
 }
 
 impl Gui {
     pub fn new(ui: &mut Ui) -> Self {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
+            state: GuiState::new(),
         }
     }
 
     /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, state: &mut GuiState, canvas: widget::Id, last: widget::Id, rect: &Rect, side: f64) -> widget::Id {
+    pub fn update(&mut self, ui: &mut UiCell, canvas: widget::Id, last: widget::Id, rect: &Rect, side: f64) -> widget::Id {
+        let state = &mut self.state;
         let ids = &self.ids;
 
         widget::Text::new("Button, XYPad and Toggle")

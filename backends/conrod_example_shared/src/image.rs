@@ -16,19 +16,25 @@ widget_ids! {
     }
 }
 
+pub struct GuiState {
+    rust_logo: conrod_core::image::Id,
+}
+
 pub struct Gui {
     ids: Ids,
+    state: GuiState,
 }
 
 impl Gui {
-    pub fn new(ui: &mut Ui) -> Self {
+    pub fn new(ui: &mut Ui, rust_logo: conrod_core::image::Id) -> Self {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
+            state: GuiState { rust_logo },
         }
     }
 
     /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, rust_logo: conrod_core::image::Id, canvas: widget::Id, last: widget::Id) -> widget::Id {
+    pub fn update(&mut self, ui: &mut UiCell, canvas: widget::Id, last: widget::Id) -> widget::Id {
         let ids = &self.ids;
 
         widget::Text::new("Image")
@@ -38,7 +44,7 @@ impl Gui {
             .set(ids.image_title, ui);
 
         const LOGO_SIDE: conrod_core::Scalar = 144.0;
-        widget::Image::new(rust_logo)
+        widget::Image::new(self.state.rust_logo)
             .w_h(LOGO_SIDE, LOGO_SIDE)
             .down(60.0)
             .align_middle_x_of(canvas)

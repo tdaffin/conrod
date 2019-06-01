@@ -48,9 +48,9 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo(&display.0));
 
     // A demonstration of some app state that we want to control with the conrod GUI.
-    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new();
     // Construct our `Ui`.
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo, app);
 
     // A type used for converting `conrod_core::render::Primitives` into `Command`s that can be used
     // for drawing to the glium `Surface`.

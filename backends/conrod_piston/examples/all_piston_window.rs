@@ -65,9 +65,9 @@ pub fn main() {
     let rust_logo = image_map.insert(rust_logo);
 
     // A demonstration of some state that we'd like to control with the App.
-    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new();
     // Instantiate the generated list of widget identifiers.
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo, app);
 
     // Poll events from the window.
     while let Some(event) = window.next() {

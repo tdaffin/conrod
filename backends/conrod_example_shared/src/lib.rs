@@ -201,16 +201,14 @@ fn theme() -> conrod_core::Theme {
 
 /// A demonstration of some application state we want to control with a conrod GUI.
 pub struct DemoApp {
-    rust_logo: conrod_core::image::Id,
     old_demo: old_demo::DemoApp,
 }
 
 
 impl DemoApp {
     /// Simple constructor for the `DemoApp`.
-    pub fn new(rust_logo: conrod_core::image::Id) -> Self {
+    pub fn new() -> Self {
         DemoApp {
-            rust_logo: rust_logo,
             old_demo: old_demo::DemoApp::new(),
         }
     }
@@ -244,14 +242,14 @@ pub struct Gui {
 }
 
 impl Gui {
-    pub fn new(manager: &mut Manager, state: DemoApp) -> Self {
+    pub fn new(manager: &mut Manager, rust_logo: conrod_core::image::Id, state: DemoApp) -> Self {
         manager.update_theme();
         let ui = manager.ui();
         Self {
             ids: Ids::new(ui.widget_id_generator()),
             text: text::Gui::new(ui),
             shapes: shapes::Gui::new(ui),
-            image: image::Gui::new(ui),
+            image: image::Gui::new(ui, rust_logo),
             button_xy_pad_toggle: button_xy_pad_toggle::Gui::new(ui),
             number_dialer_plotpath: number_dialer_plotpath::Gui::new(ui),
             canvas: canvas::Gui::new(ui),
@@ -289,7 +287,6 @@ impl Gui {
     }
 
     fn update_new(&mut self, ui: &mut UiCell){
-        let app = &mut self.state;
         let ids = &self.ids;
         let canvas = self.ids.canvas;
 
@@ -302,7 +299,7 @@ impl Gui {
 
         last = self.shapes.update(ui, canvas, last);
 
-        last = self.image.update(ui, app.rust_logo, canvas, last);
+        last = self.image.update(ui, canvas, last);
 
         let ball_x_range = ui.kid_area_of(canvas).unwrap().w();
         let ball_y_range = ui.h_of(ui.window).unwrap() * 0.5;

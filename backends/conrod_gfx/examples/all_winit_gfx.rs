@@ -104,9 +104,9 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo::<conrod_gfx::ColorFormat,_,_>(&mut factory));
 
     // Demonstration app state that we'll control with our conrod GUI.
-    let app = conrod_example_shared::DemoApp::new(rust_logo);
+    let app = conrod_example_shared::DemoApp::new();
     // Create Ui and Ids of widgets to instantiate
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, app);
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo, app);
 
     'main: loop {
         // If the window is closed, this will be None for one tick, so to avoid panicking with

@@ -89,10 +89,8 @@ fn main() {
     let mut image_map = conrod_core::image::Map::new();
     let rust_logo = image_map.insert(logo);
 
-    // Demonstration app state that we'll control with our conrod GUI.
-    let app = conrod_example_shared::DemoApp::new();
     // Create Ui and Ids of widgets to instantiate
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo, app);
+    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo);
 
     // Keep track of the previous frame so we can wait for it to complete before presenting a new
     // one. This should make sure the CPU never gets ahead of the presentation of frames, which can

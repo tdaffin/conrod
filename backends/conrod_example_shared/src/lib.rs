@@ -204,7 +204,6 @@ pub struct DemoApp {
     old_demo: old_demo::DemoApp,
 }
 
-
 impl DemoApp {
     /// Simple constructor for the `DemoApp`.
     pub fn new() -> Self {
@@ -242,7 +241,7 @@ pub struct Gui {
 }
 
 impl Gui {
-    pub fn new(manager: &mut Manager, rust_logo: conrod_core::image::Id, state: DemoApp) -> Self {
+    pub fn new(manager: &mut Manager, rust_logo: conrod_core::image::Id) -> Self {
         manager.update_theme();
         let ui = manager.ui();
         Self {
@@ -257,7 +256,7 @@ impl Gui {
             crop_kids: crop_kids::Gui::new(ui),
             list: list::Gui::new(ui),
             nested_canvas: nested_canvas::Gui::new(ui),
-            state,
+            state: DemoApp::new(),
         }
     }
 

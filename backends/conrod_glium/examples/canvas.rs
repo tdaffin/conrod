@@ -9,6 +9,7 @@ extern crate glium;
 extern crate image;
 
 use glium::Surface;
+use conrod_example_shared::Component;
 
 mod support;
 
@@ -42,7 +43,7 @@ fn main() {
     let image_map = conrod_core::image::Map::<glium::texture::Texture2d>::new();
 
     // Instantiate the generated list of widget identifiers.
-    let gui = conrod_example_shared::canvas::Gui::new(&mut ui);
+    let mut gui = conrod_example_shared::canvas::Gui::new(&mut ui);
 
     // Poll events from the window.
     let mut event_loop = support::EventLoop::new();

@@ -11,6 +11,8 @@ use conrod_core::{
     widget,
 };
 
+use super::Component;
+
 /// This struct holds all of the variables used to demonstrate application data being passed
 /// through the widgets. If some of these seem strange, that's because they are! Most of these
 /// simply represent the aesthetic state of different parts of the GUI to offer visual feedback
@@ -133,16 +135,16 @@ impl Gui {
             app: DemoApp::new(),
         }
     }
+}
 
+impl Component for Gui {
     /// Set all `Widget`s within the User Interface.
     ///
     /// The first time this gets called, each `Widget`'s `State` will be initialised and cached within
     /// the `Ui` at their given indices. Every other time this get called, the `Widget`s will avoid any
     /// allocations by updating the pre-existing cached state. A new graphical `Element` is only
     /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
-    ///
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&mut self, ui: &mut UiCell) -> widget::Id {
+    fn update(&mut self, ui: &mut UiCell) {
         let app = &mut self.app;
         let ids = &self.ids;
 
@@ -394,7 +396,5 @@ impl Gui {
                 event.update(env);
             }
         }
-
-        ids.canvas // Return id of widget that the next Gui should be down_from
     }
 }

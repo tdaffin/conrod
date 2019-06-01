@@ -18,6 +18,7 @@ extern crate rand; // for making a random color.
 mod support;
 
 use glium::Surface;
+use conrod_example_shared::Component;
 
 fn main() {
     let example = conrod_example_shared::Example::OldDemo;

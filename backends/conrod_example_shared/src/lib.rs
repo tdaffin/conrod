@@ -176,6 +176,24 @@ impl Manager {
     }
 }
 
+/// A component that contains widgets that may mutate its state
+pub trait Component {
+
+    /// Set all `Widget`s within the User Interface.
+    ///
+    /// The first time this gets called, each `Widget`'s `State` will be initialised and cached within
+    /// the `Ui` at their given indices. Every other time this get called, the `Widget`s will avoid any
+    /// allocations by updating the pre-existing cached state. A new graphical `Element` is only
+    /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
+    fn update(&mut self, ui: &mut UiCell);
+
+    fn set_canvas(&mut self, _canvas: widget::Id) {}
+    fn set_last(&mut self, _last: widget::Id) {}
+
+    /// Returns id of widget that the next Component should be down_from
+    fn get_bottom(&mut self) -> Option<widget::Id> { None }
+}
+
 /// A set of reasonable stylistic defaults that works for the `gui` below.
 fn theme() -> conrod_core::Theme {
     use conrod_core::position::{Align, Direction, Padding, Position, Relative};

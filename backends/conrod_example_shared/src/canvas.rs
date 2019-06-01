@@ -11,6 +11,8 @@ use conrod_core::{
     widget,
 };
 
+use super::Component;
+
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {
     pub struct Ids {
@@ -52,9 +54,11 @@ impl Gui {
             ids: Ids::new(ui.widget_id_generator()),
         }
     }
+}
 
-    /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell) -> widget::Id {
+impl Component for Gui {
+
+    fn update(&mut self, ui: &mut UiCell) {
         let ids = &self.ids;
 
         // Construct our main `Canvas` tree.
@@ -134,7 +138,5 @@ impl Gui {
         for _click in button.middle_of(ids.floating_b).set(ids.bong, ui) {
             println!("Bong!");
         }
-
-        ids.master // Return id of widget that the next Gui should be down_from
     }
 }

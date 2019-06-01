@@ -220,6 +220,16 @@ impl<'a> Canvas<'a> {
         self
     }
 
+    /// The area of the widget below the title bar, upon which child widgets will be placed.
+    fn kid_rect(&self, rect: Rect, style: &Style, theme: &Theme) -> Rect {
+        if self.maybe_title_bar_label.is_some() {
+            let font_size = style.title_bar_font_size(theme);
+            let title_bar = title_bar(rect, font_size);
+            rect.pad_top(title_bar.h())
+        } else {
+            rect
+        }
+    }
 }
 
 
@@ -262,18 +272,9 @@ impl<'a> Widget for Canvas<'a> {
     /// The area of the widget below the title bar, upon which child widgets will be placed.
     fn kid_area(&self, args: widget::KidAreaArgs<Self>) -> widget::KidArea {
         let widget::KidAreaArgs { rect, style, theme, .. } = args;
-        if self.maybe_title_bar_label.is_some() {
-            let font_size = style.title_bar_font_size(theme);
-            let title_bar = title_bar(rect, font_size);
-            widget::KidArea {
-                rect: rect.pad_top(title_bar.h()),
-                pad: style.padding(theme),
-            }
-        } else {
-            widget::KidArea {
-                rect: rect,
-                pad: style.padding(theme),
-            }
+        widget::KidArea {
+            rect: self.kid_rect(rect, style, theme),
+            pad: style.padding(theme),
         }
     }
 
@@ -282,8 +283,10 @@ impl<'a> Widget for Canvas<'a> {
         let widget::UpdateArgs { id, state, rect, mut ui, .. } = args;
         let Canvas { style, maybe_title_bar_label, maybe_splits, .. } = self;
 
+        let kid_rect = rect;//self.kid_rect(rect, &style, ui.theme());
+
         // BorderedRectangle widget as the rectangle backdrop.
-        let dim = rect.dim();
+        let dim = kid_rect.dim();
         let color = style.color(ui.theme());
         let border = style.border(ui.theme());
         let border_color = style.border_color(ui.theme());

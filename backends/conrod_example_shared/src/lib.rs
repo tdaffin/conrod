@@ -206,7 +206,6 @@ pub struct DemoApp {
     rust_logo: conrod_core::image::Id,
     old_demo: old_demo::DemoApp,
     crop_kids: crop_kids::GuiState,
-    list: list::GuiState,
 }
 
 
@@ -222,7 +221,6 @@ impl DemoApp {
                 running: true,
                 message: String::from("Edit this Text Area..."),
             },
-            list: list::GuiState { list: vec![true; 16] },
         }
     }
 }
@@ -325,7 +323,7 @@ impl Gui {
         let space = rect.y.end - rect.y.start + side * 0.5 + MARGIN;
         self.number_dialer_plotpath.update(ui, &mut app.sine_frequency, canvas, last, space);
 
-        self.list.update(ui, &mut app.list);
+        self.list.update(ui);
 
         self.nested_canvas.update(ui);
 

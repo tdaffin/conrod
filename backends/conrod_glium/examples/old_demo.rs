@@ -37,7 +37,7 @@ fn main() {
     let mut ui = example.new_ui();
 
     // Identifiers used for instantiating our widgets.
-    let gui = conrod_example_shared::old_demo::Gui::new(&mut ui);
+    let mut gui = conrod_example_shared::old_demo::Gui::new(&mut ui);
 
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
@@ -50,9 +50,6 @@ fn main() {
 
     // The image map describing each of our widget->image mappings (in our case, none).
     let image_map = conrod_core::image::Map::<glium::texture::Texture2d>::new();
-
-    // Our demonstration app that we'll control with our GUI.
-    let mut app = conrod_example_shared::old_demo::DemoApp::new();
 
     // Poll events from the window.
     let mut event_loop = support::EventLoop::new();
@@ -85,7 +82,7 @@ fn main() {
         }
 
         // We'll set all our widgets in a single function called `set_widgets`.
-        gui.update(&mut ui.set_widgets(), &mut app);
+        gui.update(&mut ui.set_widgets());
 
         // Render the `Ui` and then display it on the screen.
         if let Some(primitives) = ui.draw_if_changed() {

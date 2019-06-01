@@ -123,12 +123,14 @@ widget_ids! {
 
 pub struct Gui {
     ids: Ids,
+    app: DemoApp,
 }
 
 impl Gui {
     pub fn new(ui: &mut Ui) -> Self {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
+            app: DemoApp::new(),
         }
     }
 
@@ -140,7 +142,8 @@ impl Gui {
     /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
     ///
     /// Returns id of widget that the next Gui should be down_from
-    pub fn update(&self, ui: &mut UiCell, app: &mut DemoApp) -> widget::Id {
+    pub fn update(&mut self, ui: &mut UiCell) -> widget::Id {
+        let app = &mut self.app;
         let ids = &self.ids;
 
         // We can use this `Canvas` as a parent Widget upon which we can place other widgets.

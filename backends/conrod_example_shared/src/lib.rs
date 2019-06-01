@@ -199,20 +199,6 @@ fn theme() -> conrod_core::Theme {
     }
 }
 
-/// A demonstration of some application state we want to control with a conrod GUI.
-pub struct DemoApp {
-    old_demo: old_demo::DemoApp,
-}
-
-impl DemoApp {
-    /// Simple constructor for the `DemoApp`.
-    pub fn new() -> Self {
-        DemoApp {
-            old_demo: old_demo::DemoApp::new(),
-        }
-    }
-}
-
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {
     pub struct Ids {
@@ -237,7 +223,6 @@ pub struct Gui {
     crop_kids: crop_kids::Gui,
     list: list::Gui,
     nested_canvas: nested_canvas::Gui,
-    state: DemoApp,
 }
 
 impl Gui {
@@ -256,7 +241,6 @@ impl Gui {
             crop_kids: crop_kids::Gui::new(ui),
             list: list::Gui::new(ui),
             nested_canvas: nested_canvas::Gui::new(ui),
-            state: DemoApp::new(),
         }
     }
 
@@ -280,7 +264,7 @@ impl Gui {
                 self.canvas.update(ui);
             },
             Example::OldDemo => {
-                self.old_demo.update(ui, &mut self.state.old_demo);
+                self.old_demo.update(ui);
             },
         }
     }

@@ -10,33 +10,20 @@
 //! and drawing backends behave in the same manner.
 #![allow(dead_code)]
 
-mod crop_kids;
-mod list;
-mod nested_canvas;
-
 #[macro_use] extern crate conrod_core;
 extern crate rand;
 extern crate input;
 
-mod layout;
-mod text;
-mod shapes;
-mod image;
-mod button_xy_pad_toggle;
-mod number_dialer_plotpath;
-
+mod all_widgets;
 pub mod canvas;
 pub mod old_demo;
 
 mod template; // Not used, but intended as a file to copy-paste new components from
 
-use layout::*;
-
 use conrod_core::{
     Theme,
     Ui,
     UiCell,
-    Widget,
     widget
 };
 
@@ -239,22 +226,8 @@ fn theme() -> conrod_core::Theme {
     }
 }
 
-// Generate a unique `WidgetId` for each widget.
-widget_ids! {
-    pub struct Ids {
-        // The scrollable canvas.
-        canvas,
-        // Scrollbar
-        canvas_scrollbar,
-        // A non-scrolling overlay canvas
-        overlay,
-    }
-}
-
 pub struct Gui {
-    ids: Ids,
-    components: Vec<Box<Component>>,
-    crop_kids: crop_kids::Gui,
+    all_widgets: all_widgets::Gui,
     canvas: canvas::Gui,
     old_demo: old_demo::Gui,
 }
@@ -264,17 +237,7 @@ impl Gui {
         manager.update_theme();
         let ui = manager.ui();
         Self {
-            ids: Ids::new(ui.widget_id_generator()),
-            components: vec![
-                Box::new(text::Gui::new(ui)),
-                Box::new(shapes::Gui::new(ui)),
-                Box::new(image::Gui::new(ui, rust_logo)),
-                Box::new(button_xy_pad_toggle::Gui::new(ui)),
-                Box::new(number_dialer_plotpath::Gui::new(ui)),
-                Box::new(list::Gui::new(ui)),
-                Box::new(nested_canvas::Gui::new(ui)),
-            ],
-            crop_kids: crop_kids::Gui::new(ui),
+            all_widgets: all_widgets::Gui::new(ui, rust_logo),
             canvas: canvas::Gui::new(ui),
             old_demo: old_demo::Gui::new(ui),
         }
@@ -286,50 +249,10 @@ impl Gui {
         let ui = &mut manager.ui().set_widgets();
         let env = Env::new(ui);
         match manager.example {
-            Example::New => {
-                self.update_new(ui);
-
-                // Transparent overlay canvas, the size of the window
-                /*
-                let window = ui.window;
-                widget::Canvas::new()
-                    .top_left_of(window)
-                    .wh_of(window)
-                    .set(self.ids.overlay, ui);*/
-            },
-            Example::Canvas => {
-                self.canvas.update(ui, &env);
-            },
-            Example::OldDemo => {
-                self.old_demo.update(ui, &env);
-            },
+            Example::New => self.all_widgets.update(ui, &env),
+            Example::Canvas => self.canvas.update(ui, &env),
+            Example::OldDemo => self.old_demo.update(ui, &env),
         }
-    }
-
-    fn update_new(&mut self, ui: &mut UiCell){
-        let ids = &self.ids;
-        let canvas = self.ids.canvas;
-        let mut env = Env::new(ui);
-        env.set_canvas(canvas);
-
-        // `Canvas` is a widget that provides some basic functionality for laying out children widgets.
-        // By default, its size is the size of the window. We'll use this as a background for the
-        // following widgets, as well as a scrollable container for the children widgets.
-        widget::Canvas::new().pad(MARGIN).scroll_kids_vertically().set(canvas, ui);
-
-        for component in self.components.iter_mut() {
-            component.update(ui, &env);
-            if let Some(last) = component.get_bottom() {
-                env.set_last(last);
-            }
-        }
-
-        // Close the scrollable region
-        widget::Scrollbar::y_axis(canvas).auto_hide(true).set(ids.canvas_scrollbar, ui);
-
-        // Add after the scrollbar as it is draggable and will interfere with the scroll if inside it
-        env.set_last(canvas);
-        self.crop_kids.update(ui, &env);
     }
 
 }

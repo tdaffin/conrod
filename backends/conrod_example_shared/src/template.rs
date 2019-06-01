@@ -3,6 +3,7 @@ use conrod_core::{
     Color,
     Colorable,
     Positionable,
+    Scalar,
     Sizeable,
     Ui,
     UiCell,
@@ -11,7 +12,8 @@ use conrod_core::{
     widget,
 };
 use super::{Component, Env};
-use layout::*;
+
+const MARGIN: Scalar = 30.0;
 
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {

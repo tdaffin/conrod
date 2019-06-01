@@ -9,8 +9,7 @@ use conrod_core::{
     UiCell,
     widget,
 };
-use super::{Component, Env};
-use layout::*;
+use super::{Component, Env, layout::*};
 
 widget_ids! {
     pub struct Ids {

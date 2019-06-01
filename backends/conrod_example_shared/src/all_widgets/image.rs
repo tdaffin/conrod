@@ -6,8 +6,7 @@ use conrod_core::{
     Widget,
     widget,
 };
-use super::{Component, Env};
-use layout::*;
+use super::{Component, Env, layout::*};
 
 widget_ids! {
     pub struct Ids {

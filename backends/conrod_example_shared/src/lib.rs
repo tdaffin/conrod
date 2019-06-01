@@ -205,7 +205,6 @@ pub struct DemoApp {
     sine_frequency: f32,
     rust_logo: conrod_core::image::Id,
     old_demo: old_demo::DemoApp,
-    crop_kids: crop_kids::GuiState,
 }
 
 
@@ -217,10 +216,6 @@ impl DemoApp {
             sine_frequency: 1.0,
             rust_logo: rust_logo,
             old_demo: old_demo::DemoApp::new(),
-            crop_kids: crop_kids::GuiState {
-                running: true,
-                message: String::from("Edit this Text Area..."),
-            },
         }
     }
 }
@@ -334,7 +329,7 @@ impl Gui {
         widget::Scrollbar::y_axis(canvas).auto_hide(true).set(ids.canvas_scrollbar, ui);
 
         // Add after the scrollbar as it is draggable and will interfere with the scroll if inside it
-        self.crop_kids.update(ui, &mut app.crop_kids);
+        self.crop_kids.update(ui);
     }
 
 }

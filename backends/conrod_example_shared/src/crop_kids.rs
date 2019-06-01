@@ -25,16 +25,22 @@ pub struct GuiState {
 
 pub struct Gui {
     ids: Ids,
+    state: GuiState,
 }
 
 impl Gui {
     pub fn new(ui: &mut Ui) -> Self {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
+            state: GuiState {
+                running: true,
+                message: String::from("Edit this Text Area..."),
+            },
         }
     }
 
-    pub fn update(&self, ui: &mut UiCell, state: &mut GuiState) {
+    pub fn update(&mut self, ui: &mut UiCell) {
+        let state = &mut self.state;
         if !state.running {
             return;
         }

@@ -28,6 +28,7 @@ use vulkano::{
 };
 
 use conrod_vulkano::{Image as VulkanoGuiImage, Renderer};
+use conrod_example_shared::{Manager, Namer};
 
 type DepthFormat = D16Unorm;
 const DEPTH_FORMAT_TY: DepthFormat = D16Unorm;
@@ -35,13 +36,13 @@ const DEPTH_FORMAT: Format = Format::D16Unorm;
 const CLEAR_COLOR: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
 
 fn main() {
-    let mut manager = conrod_example_shared::Manager::new();
-    let namer = conrod_example_shared::Namer::new("Conrod with vulkano");
+    let info = Manager::info();
+    let namer = Namer::new("Conrod with vulkano");
 
     let mut events_loop = winit::EventsLoop::new();
-    let size = manager.example().info().size;
+    let size = info.size;
     let mut window = support::Window::new(size.0, size.1,
-        &namer.title(&manager.example().info().name), &events_loop);
+        &namer.title(&info.name), &events_loop);
     window.surface.window().set_resizable(true);
 
     let mut render_target = RenderTarget::new(&window);
@@ -57,15 +58,8 @@ fn main() {
         window.surface.window().get_hidpi_factor() as f64,
     ).unwrap();
 
-    // Load font from file
-    let assets = find_folder::Search::KidsThenParents(3, 5)
-        .for_folder("assets")
-        .unwrap();
-    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    manager.ui().fonts.insert_from_file(font_path).unwrap();
-
     // Load the Rust logo from our assets folder to use as an example image.
-    let logo_path = assets.join("images/rust.png");
+    let logo_path = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap().join("images/rust.png");
     let rgba_logo_image = image::open(logo_path)
         .expect("Couldn't load logo")
         .to_rgba();
@@ -91,7 +85,12 @@ fn main() {
     let rust_logo = image_map.insert(logo);
 
     // Create Ui and Ids of widgets to instantiate
-    manager.init(rust_logo);
+    let mut manager = conrod_example_shared::Manager::new(rust_logo);
+
+    // Load font from file
+    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
+    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Keep track of the previous frame so we can wait for it to complete before presenting a new
     // one. This should make sure the CPU never gets ahead of the presentation of frames, which can

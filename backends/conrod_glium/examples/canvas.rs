@@ -17,11 +17,13 @@ use conrod_example_shared::{
 mod support;
 
 fn main() {
+    let info = info();
+    let size = info.size;
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title(NAME)
-        .with_dimensions(SIZE.into());
+        .with_title(info.name)
+        .with_dimensions(size.into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -29,7 +31,7 @@ fn main() {
     let display = support::GliumDisplayWinitWrapper(display);
 
     // construct our `Ui`.
-    let mut ui = conrod_core::UiBuilder::new([SIZE.0 as f64, SIZE.1 as f64]).build();
+    let mut ui = conrod_core::UiBuilder::new([size.0 as f64, size.1 as f64]).build();
 
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();

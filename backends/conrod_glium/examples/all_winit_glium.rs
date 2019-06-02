@@ -12,14 +12,14 @@ mod support;
 
 use conrod_glium::Renderer;
 use glium::Surface;
+use conrod_example_shared::{Manager, Namer};
 
 fn main() {
-    let mut manager = conrod_example_shared::Manager::new();
-    let namer = conrod_example_shared::Namer::new("Conrod with glium!");
+    let namer = Namer::new("Conrod with glium!");
+    let info = Manager::info();
 
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
-    let info = manager.example().info().clone();
     let window = glium::glutin::WindowBuilder::new()
         .with_title(namer.title(&info.name))
         .with_dimensions(info.size.into());
@@ -28,11 +28,6 @@ fn main() {
         .with_multisampling(4);
     let display = glium::Display::new(window, context, &events_loop).unwrap();
     let display = support::GliumDisplayWinitWrapper(display);
-
-    // Add a `Font` to the `Ui`'s `font::Map` from file.
-    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
-    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Load the Rust logo from our assets folder to use as an example image.
     fn load_rust_logo(display: &glium::Display) -> glium::texture::Texture2d {
@@ -49,7 +44,11 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo(&display.0));
 
     // Construct our `Ui`.
-    manager.init(rust_logo);
+    let mut manager = Manager::new(rust_logo);
+    // Add a `Font` to the `Ui`'s `font::Map` from file.
+    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
+    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // A type used for converting `conrod_core::render::Primitives` into `Command`s that can be used
     // for drawing to the glium `Surface`.

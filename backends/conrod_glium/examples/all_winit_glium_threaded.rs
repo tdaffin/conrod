@@ -14,17 +14,18 @@ mod support;
 
 use conrod_glium::Renderer;
 use glium::Surface;
-use conrod_example_shared::all_widgets::*;
+use conrod_example_shared::{Manager, Namer};
 
 
 fn main() {
-    let namer = conrod_example_shared::Namer::new("Conrod with glium (threaded)!");
+    let namer = Namer::new("Conrod with glium (threaded)!");
+    let info = Manager::info();
 
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title(namer.title(NAME))
-        .with_dimensions(SIZE.into());
+        .with_title(namer.title(&info.name))
+        .with_dimensions(info.size.into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -72,15 +73,13 @@ fn main() {
                   example_tx: std::sync::mpsc::Sender<conrod_example_shared::Info>,
                   events_loop_proxy: glium::glutin::EventsLoopProxy)
     {
-        let mut manager = conrod_example_shared::Manager::new();
+        // The `widget::Id` of each widget instantiated in `conrod_example_shared::gui`.
+        let mut manager = conrod_example_shared::Manager::new(rust_logo);
 
         // Add a `Font` to the `Ui`'s `font::Map` from file.
         let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
         let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
         manager.ui().fonts.insert_from_file(font_path).unwrap();
-
-        // The `widget::Id` of each widget instantiated in `conrod_example_shared::gui`.
-        manager.init(rust_logo);
 
         // Many widgets require another frame to finish drawing after clicks or hovers, so we
         // insert an update into the conrod loop using this `bool` after each event.

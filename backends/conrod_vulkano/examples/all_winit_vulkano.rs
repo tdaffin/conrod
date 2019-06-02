@@ -88,6 +88,7 @@ fn main() {
     let mut manager = conrod_example_shared::Manager::new(rust_logo);
 
     // Load font from file
+    // TODO: Font loading can be shared between all backends I think
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
     manager.ui().fonts.insert_from_file(font_path).unwrap();

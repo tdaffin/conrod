@@ -46,6 +46,7 @@ fn main() {
     // Construct our `Ui`.
     let mut manager = Manager::new(rust_logo);
     // Add a `Font` to the `Ui`'s `font::Map` from file.
+    // TODO: Font loading can be shared between all backends I think
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
     let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
     manager.ui().fonts.insert_from_file(font_path).unwrap();

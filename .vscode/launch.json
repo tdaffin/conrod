@@ -1,0 +1,992 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_core'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_core"
+                ],
+                "filter": {
+                    "name": "conrod_core",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_example_shared'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_example_shared"
+                ],
+                "filter": {
+                    "name": "conrod_example_shared",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_winit'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_winit"
+                ],
+                "filter": {
+                    "name": "conrod_winit",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_gfx'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_gfx"
+                ],
+                "filter": {
+                    "name": "conrod_gfx",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'all_winit_gfx'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=all_winit_gfx",
+                    "--package=conrod_gfx"
+                ],
+                "filter": {
+                    "name": "all_winit_gfx",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'all_winit_gfx'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=all_winit_gfx",
+                    "--package=conrod_gfx"
+                ],
+                "filter": {
+                    "name": "all_winit_gfx",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_glium'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "conrod_glium",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'triangles'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=triangles",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "triangles",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'triangles'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=triangles",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "triangles",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'image_button'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=image_button",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "image_button",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'image_button'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=image_button",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "image_button",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'file_navigator'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=file_navigator",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "file_navigator",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'file_navigator'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=file_navigator",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "file_navigator",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'all_winit_glium_threaded'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=all_winit_glium_threaded",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "all_winit_glium_threaded",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'all_winit_glium_threaded'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=all_winit_glium_threaded",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "all_winit_glium_threaded",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'image'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=image",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "image",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'image'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=image",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "image",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'list_select'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=list_select",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "list_select",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'list_select'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=list_select",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "list_select",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'text'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=text",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "text",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'text'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=text",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "text",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'range_slider'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=range_slider",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "range_slider",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'range_slider'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=range_slider",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "range_slider",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'hello_world'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=hello_world",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "hello_world",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'hello_world'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=hello_world",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "hello_world",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'graph'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=graph",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "graph",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'graph'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=graph",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "graph",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'primitives'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=primitives",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "primitives",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'primitives'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=primitives",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "primitives",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'counter'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=counter",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "counter",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'counter'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=counter",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "counter",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'old_demo'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=old_demo",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "old_demo",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'old_demo'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=old_demo",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "old_demo",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'text_edit'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=text_edit",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "text_edit",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'text_edit'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=text_edit",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "text_edit",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'all_winit_glium'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=all_winit_glium",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "all_winit_glium",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'all_winit_glium'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=all_winit_glium",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "all_winit_glium",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'canvas'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=canvas",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "canvas",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'canvas'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=canvas",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "canvas",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'list'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=list",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "list",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'list'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=list",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "list",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'plot_path'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=plot_path",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "plot_path",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'plot_path'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=plot_path",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "plot_path",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'custom_widget'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=custom_widget",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "custom_widget",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'custom_widget'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=custom_widget",
+                    "--package=conrod_glium"
+                ],
+                "filter": {
+                    "name": "custom_widget",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_piston'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_piston"
+                ],
+                "filter": {
+                    "name": "conrod_piston",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'all_piston_window'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=all_piston_window",
+                    "--package=conrod_piston"
+                ],
+                "filter": {
+                    "name": "all_piston_window",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'all_piston_window'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=all_piston_window",
+                    "--package=conrod_piston"
+                ],
+                "filter": {
+                    "name": "all_piston_window",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'conrod_vulkano'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=conrod_vulkano"
+                ],
+                "filter": {
+                    "name": "conrod_vulkano",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'all_winit_vulkano'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=all_winit_vulkano",
+                    "--package=conrod_vulkano"
+                ],
+                "filter": {
+                    "name": "all_winit_vulkano",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'all_winit_vulkano'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=all_winit_vulkano",
+                    "--package=conrod_vulkano"
+                ],
+                "filter": {
+                    "name": "all_winit_vulkano",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'list_select_vulkano'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=list_select_vulkano",
+                    "--package=conrod_vulkano"
+                ],
+                "filter": {
+                    "name": "list_select_vulkano",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'list_select_vulkano'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=list_select_vulkano",
+                    "--package=conrod_vulkano"
+                ],
+                "filter": {
+                    "name": "list_select_vulkano",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

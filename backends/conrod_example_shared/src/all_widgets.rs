@@ -120,6 +120,14 @@ impl Component for Gui {
         // Close the scrollable region
         widget::Scrollbar::y_axis(canvas).auto_hide(true).set(ids.canvas_scrollbar, ui);
 
+        // Transparent overlay canvas, the size of the window
+        /*
+        let window = ui.window;
+        widget::Canvas::new()
+            .top_left_of(window)
+            .wh_of(window)
+            .set(self.ids.overlay, ui);*/            
+
         // Add after the scrollbar as it is draggable and will interfere with the scroll if inside it
         env.set_last(canvas);
         self.crop_kids.update(ui, &env);

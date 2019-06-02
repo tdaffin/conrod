@@ -12,6 +12,9 @@ use conrod_core::{
 };
 use super::{Component, Env};
 
+pub const NAME: &str = "Widget Demonstration";
+pub const SIZE: (u32, u32) = (1100, 560);
+
 /// This struct holds all of the variables used to demonstrate application data being passed
 /// through the widgets. If some of these seem strange, that's because they are! Most of these
 /// simply represent the aesthetic state of different parts of the GUI to offer visual feedback
@@ -133,17 +136,6 @@ impl Gui {
             ids: Ids::new(ui.widget_id_generator()),
             app: DemoApp::new(),
         }
-    }
-
-    /// Set all `Widget`s within the User Interface.
-    ///
-    /// The first time this gets called, each `Widget`'s `State` will be initialised and cached within
-    /// the `Ui` at their given indices. Every other time this get called, the `Widget`s will avoid any
-    /// allocations by updating the pre-existing cached state. A new graphical `Element` is only
-    /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
-    pub fn set_widgets(&mut self, ui: &mut UiCell) {
-        let env = Env::new(ui);
-        self.update(ui, &env);
     }
 }
 

@@ -16,9 +16,9 @@ pub fn main() {
     let namer = conrod_example_shared::Namer::new("Piston Backend");
 
     // Construct the window.
+    let size = manager.example().info().size;
     let mut window: PistonWindow =
-        WindowSettings::new(namer.title(&manager.example()),
-                [manager.win_w(), manager.win_h()])
+        WindowSettings::new(namer.title(&manager.example().info().name), [size.0, size.1])
             .opengl(OpenGL::V3_2) // If not working, try `OpenGL::V2_1`.
             .samples(4)
             .exit_on_esc(true)
@@ -37,16 +37,16 @@ pub fn main() {
         const SCALE_TOLERANCE: f32 = 0.1;
         const POSITION_TOLERANCE: f32 = 0.1;
         let cache = conrod_core::text::GlyphCache::builder()
-            .dimensions(manager.win_w(), manager.win_h())
+            .dimensions(size.0, size.1)
             .scale_tolerance(SCALE_TOLERANCE)
             .position_tolerance(POSITION_TOLERANCE)
             .build();
-        let buffer_len = manager.win_w() as usize * manager.win_h() as usize;
+        let buffer_len = size.0 as usize * size.1 as usize;
         let init = vec![128; buffer_len];
         let settings = TextureSettings::new();
         let factory = &mut window.factory;
         let texture = G2dTexture::from_memory_alpha(factory, &init,
-            manager.win_w(), manager.win_h(), &settings).unwrap();
+            size.0, size.1, &settings).unwrap();
         (cache, texture)
     };
 
@@ -65,7 +65,7 @@ pub fn main() {
     let rust_logo = image_map.insert(rust_logo);
 
     // Instantiate the generated list of widget identifiers.
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo);
+    manager.init(rust_logo);
 
     // Poll events from the window.
     while let Some(event) = window.next() {
@@ -74,16 +74,15 @@ pub fn main() {
         let size = window.size();
         let (win_w, win_h) = (size.width as conrod_core::Scalar, size.height as conrod_core::Scalar);
         if let Some(e) = conrod_piston::event::convert(event.clone(), win_w, win_h) {
-            if let Some(example) = manager.handle_event(e) {
+            if let Some(_) = manager.handle_event(e) {
                 let w = &mut window.window;
-                w.set_title(namer.title(&manager.example()));
-                w.set_size(example.size());
+                let info = manager.example().info();
+                w.set_title(namer.title(&info.name));
+                w.set_size(info.size);
             }
         }
 
-        event.update(|_| {
-            gui.update_ui(&mut manager);
-        });
+        event.update(|_| manager.update());
 
         window.draw_2d(&event, |context, graphics| {
             if let Some(primitives) = manager.ui().draw_if_changed() {

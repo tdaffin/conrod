@@ -14,16 +14,17 @@ mod support;
 
 use conrod_glium::Renderer;
 use glium::Surface;
+use conrod_example_shared::all_widgets::*;
+
 
 fn main() {
-    let manager = conrod_example_shared::Manager::new();
     let namer = conrod_example_shared::Namer::new("Conrod with glium (threaded)!");
 
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title(namer.title(&manager.example()))
-        .with_dimensions((manager.win_w(), manager.win_h()).into());
+        .with_title(namer.title(NAME))
+        .with_dimensions(SIZE.into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -65,20 +66,21 @@ fn main() {
     let events_loop_proxy = events_loop.create_proxy();
 
     // A function that runs the conrod loop.
-    fn run_conrod(mut manager: conrod_example_shared::Manager,
-                  rust_logo: conrod_core::image::Id,
+    fn run_conrod(rust_logo: conrod_core::image::Id,
                   event_rx: std::sync::mpsc::Receiver<conrod_core::event::Input>,
                   render_tx: std::sync::mpsc::Sender<conrod_core::render::OwnedPrimitives>,
-                  example_tx: std::sync::mpsc::Sender<conrod_example_shared::Example>,
+                  example_tx: std::sync::mpsc::Sender<conrod_example_shared::Info>,
                   events_loop_proxy: glium::glutin::EventsLoopProxy)
     {
+        let mut manager = conrod_example_shared::Manager::new();
+
         // Add a `Font` to the `Ui`'s `font::Map` from file.
         let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
         let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
         manager.ui().fonts.insert_from_file(font_path).unwrap();
 
         // The `widget::Id` of each widget instantiated in `conrod_example_shared::gui`.
-        let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo);
+        manager.init(rust_logo);
 
         // Many widgets require another frame to finish drawing after clicks or hovers, so we
         // insert an update into the conrod loop using this `bool` after each event.
@@ -103,9 +105,9 @@ fn main() {
 
             // Input each event into the `Ui`.
             for event in events {
-                if let Some(example) = manager.handle_event(event) {
+                if let Some(_) = manager.handle_event(event) {
                     // Send newly requested example to the main thread for display.
-                    if example_tx.send(example).is_err() {
+                    if example_tx.send(manager.example().info().clone()).is_err() {
                         break 'conrod;
                     };
                 }
@@ -113,7 +115,7 @@ fn main() {
             }
 
             // Instantiate a GUI demonstrating every widget type provided by conrod.
-            gui.update_ui(&mut manager);
+            manager.update();
 
             // Render the `Ui` to a list of primitives that we can send to the main thread for
             // display. Wakeup `winit` for rendering.
@@ -140,7 +142,7 @@ fn main() {
     }
 
     // Spawn the conrod loop on its own thread.
-    std::thread::spawn(move || run_conrod(manager, rust_logo, event_rx, render_tx, example_tx, events_loop_proxy));
+    std::thread::spawn(move || run_conrod(rust_logo, event_rx, render_tx, example_tx, events_loop_proxy));
 
     // Run the `winit` loop.
     let mut last_update = std::time::Instant::now();
@@ -157,10 +159,10 @@ fn main() {
         }
 
         // Handle change of active example
-        if let Ok(example) = example_rx.try_recv() {
+        if let Ok(info) = example_rx.try_recv() {
             let w = display.0.gl_window();
-            w.set_title(&namer.title(&example));
-            w.set_inner_size(example.size().into());
+            w.set_title(&namer.title(&info.name));
+            w.set_inner_size(info.size.into());
         }
 
         events_loop.run_forever(|event| {

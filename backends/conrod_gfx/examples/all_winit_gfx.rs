@@ -47,9 +47,10 @@ fn main() {
     let namer = conrod_example_shared::Namer::new("Conrod with GFX and Glutin");
 
     // Builder for window
+    let info = manager.example().info().clone();
     let builder = glutin::WindowBuilder::new()
-        .with_title(namer.title(&manager.example()))
-        .with_dimensions((manager.win_w(), manager.win_h()).into());
+        .with_title(namer.title(&info.name))
+        .with_dimensions(info.size.into());
 
     let context = glutin::ContextBuilder::new()
         .with_multisampling(4);
@@ -104,7 +105,7 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo::<conrod_gfx::ColorFormat,_,_>(&mut factory));
 
     // Create Ui and Ids of widgets to instantiate
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo);
+    manager.init(rust_logo);
 
     'main: loop {
         // If the window is closed, this will be None for one tick, so to avoid panicking with
@@ -136,10 +137,11 @@ fn main() {
 
             // Convert winit event to conrod event, requires conrod to be built with the `winit` feature
             if let Some(event) = convert_event(event.clone(), &WindowRef(window.window())) {
-                if let Some(example) = manager.handle_event(event) {
+                if let Some(example_id) = manager.handle_event(event) {
                     let w = window.window();
-                    w.set_title(&namer.title(&manager.example()));
-                    w.set_inner_size(example.size().into());
+                    let info = manager.example().info();
+                    w.set_title(&namer.title(&info.name));
+                    w.set_inner_size(info.size.into());
                 }
             }
 
@@ -167,7 +169,7 @@ fn main() {
 
         // Update widgets if any event has happened
         if manager.ui().global_input().events().next().is_some() {
-            gui.update_ui(&mut manager);
+            manager.update();
         }
     }
 }

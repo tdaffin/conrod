@@ -12,6 +12,9 @@ use conrod_core::{
 };
 use super::{Component, Env};
 
+pub const NAME: &str = "Canvas";
+pub const SIZE: (u32, u32) = (800, 600);
+
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {
     pub struct Ids {
@@ -52,11 +55,6 @@ impl Gui {
         Self {
             ids: Ids::new(ui.widget_id_generator()),
         }
-    }
-
-    pub fn set_widgets(&mut self, ui: &mut UiCell) {
-        let env = Env::new(ui);
-        self.update(ui, &env);
     }
 }
 

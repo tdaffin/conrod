@@ -14,7 +14,7 @@
 extern crate rand;
 extern crate input;
 
-mod all_widgets;
+pub mod all_widgets;
 pub mod canvas;
 pub mod old_demo;
 
@@ -27,51 +27,53 @@ use conrod_core::{
     widget
 };
 
-#[derive(Copy, Clone)]
-pub enum Example {
-    New,
-    Canvas,
-    OldDemo,
+#[derive(Clone)]
+pub struct Info {
+    pub name: String,
+    pub size: (u32, u32),
+}
+
+pub struct Example {
+    info: Info,
+    component: Box<Component>,
+    theme: Box<Fn() -> Theme>,
 }
 
 impl Example {
-
-    pub fn name(&self) -> &'static str {
-        match self {
-            Example::New => "All Widgets",
-            Example::Canvas => "Canvas",
-            Example::OldDemo => "Widget Demonstration",
+    fn new(name: &str, size: (u32, u32), component: Box<Component>) -> Self {
+        Self {
+            info: Info {
+                name: name.to_owned(),
+                size,
+            },
+            component,
+            theme: Box::new(|| Theme::default()),
         }
     }
 
-    pub fn size(&self) -> (u32, u32) {
-        match self {
-            Example::New => (600, 420),
-            Example::Canvas => (800, 600),
-            Example::OldDemo => (1100, 560),
-        }
+    fn with_theme(mut self, theme: Box<Fn() -> Theme>) -> Self {
+        self.theme = theme;
+        self
     }
 
-    pub fn new_ui(&self) -> Ui {
-        let (win_w, win_h) = self.size();
-        conrod_core::UiBuilder::new([win_w as f64, win_h as f64]).build()
+    fn theme(&self) -> Theme {
+        (self.theme)()
     }
 
-    pub fn theme(&self) -> Theme {
-        match self {
-            Example::New => theme(),
-            Example::Canvas => Theme::default(),
-            Example::OldDemo => Theme::default(),
-        }
+    pub fn info(&self) -> &Info {
+        &self.info
     }
 
-    pub fn next(&self) -> Example {
-        match self {
-            Example::New => Example::Canvas,
-            Example::Canvas => Example::OldDemo,
-            Example::OldDemo => Example::New,
-        }
+    /// Set all `Widget`s within the User Interface.
+    ///
+    /// The first time this gets called, each `Widget`'s `State` will be initialised and cached within
+    /// the `Ui` at their given indices. Every other time this get called, the `Widget`s will avoid any
+    /// allocations by updating the pre-existing cached state. A new graphical `Element` is only
+    /// retrieved from a `Widget` in the case that it's `State` has changed in some way.
+    fn set_widgets(&mut self, ui: &mut UiCell){
+        self.component.set_widgets(ui);
     }
+
 }
 
 pub struct Namer {
@@ -85,55 +87,54 @@ impl Namer {
         }
     }
 
-    pub fn title(&self, example: &Example) -> String {
-        format!("{} - {}, [Tab] Changes Example", self.prefix, example.name())
+    pub fn title(&self, example_name: &str) -> String {
+        format!("{} - {}, [Tab] Changes Example", self.prefix, example_name)
     }
 }
 
 pub struct Manager {
-    example: Example,
-    maybe_ui: Option<Ui>,
+    examples: Vec<Example>,
+    example_id: usize,
+    ui: Ui,
 }
 
 impl Manager {
     pub fn new() -> Self {
-        Self::new_from(Example::New)
-    }
-
-    pub fn new_from(example: Example) -> Self {
+        let size = all_widgets::SIZE; // It would be convenient if UiBuilder didn't need an initial size
+        let ui = conrod_core::UiBuilder::new([size.0 as f64, size.1 as f64]).build();
         Self {
-            example,
-            maybe_ui: None,
+            examples: Vec::new(),
+            example_id: 0,
+            ui,
         }
     }
 
-    pub fn example(&self) -> Example {
-        self.example
+    pub fn init(&mut self, rust_logo: conrod_core::image::Id){
+        let ui = &mut self.ui;
+        self.examples.push(Example::new(all_widgets::NAME, all_widgets::SIZE,
+            Box::new(all_widgets::Gui::new(ui, rust_logo))
+        ).with_theme(Box::new(all_widgets::theme)));
+        self.examples.push(Example::new(canvas::NAME, canvas::SIZE,
+            Box::new(canvas::Gui::new(ui))
+        ));
+        self.examples.push(Example::new(old_demo::NAME, old_demo::SIZE,
+            Box::new(old_demo::Gui::new(ui))
+        ));
     }
 
     pub fn ui(&mut self) -> &mut Ui {
-        match self.maybe_ui {
-            Some(ref mut ui) => ui,
-            None => {
-                let example = self.example;
-                self.maybe_ui.get_or_insert_with(|| example.new_ui())
-            }
-        }
+        &mut self.ui
     }
 
-    pub fn win_w(&self) -> u32 {
-        self.example.size().0
+    pub fn example(&self) -> &Example {
+        &self.examples[self.example_id]
     }
 
-    pub fn win_h(&self) -> u32 {
-        self.example.size().1
+    fn update_theme(&mut self) {
+        self.ui.theme = self.example().theme();
     }
 
-    pub fn theme(&self) -> Theme {
-        self.example.theme()
-    }
-
-    pub fn handle_event(&mut self, event: conrod_core::event::Input) -> Option<Example> {
+    pub fn handle_event(&mut self, event: conrod_core::event::Input) -> Option<usize> {
         use conrod_core::event::Input::*;
         match event {
             Focus(_focussed) => {
@@ -145,20 +146,21 @@ impl Manager {
                     }
                     if key == input::Key::Tab {
                         // Change example
-                        self.example = self.example.next();
+                        self.example_id = (self.example_id + 1) % self.examples.len();
                         self.update_theme();
-                        return Some(self.example);
+                        return Some(self.example_id);
                     }
                 }
             },
             _ => {},
         }
-        self.ui().handle_event(event);
+        self.ui.handle_event(event);
         None
     }
 
-    fn update_theme(&mut self) {
-        self.ui().theme = self.example.theme();
+    pub fn update(&mut self){
+        let example = &mut self.examples[self.example_id];
+        example.set_widgets(&mut self.ui.set_widgets());
     }
 }
 
@@ -191,6 +193,11 @@ impl Env {
 /// A component that contains widgets that may mutate its state
 pub trait Component {
 
+    fn set_widgets(&mut self, ui: &mut UiCell){
+        let env = Env::new(ui);
+        self.update(ui, &env);
+    }
+
     /// Set all `Widget`s within the User Interface.
     ///
     /// The first time this gets called, each `Widget`'s `State` will be initialised and cached within
@@ -201,58 +208,4 @@ pub trait Component {
 
     /// Returns id of widget that the next Component should be down_from
     fn get_bottom(&self) -> Option<widget::Id> { None }
-}
-
-/// A set of reasonable stylistic defaults that works for the `gui` below.
-fn theme() -> conrod_core::Theme {
-    use conrod_core::position::{Align, Direction, Padding, Position, Relative};
-    conrod_core::Theme {
-        name: "Demo Theme".to_string(),
-        padding: Padding::none(),
-        x_position: Position::Relative(Relative::Align(Align::Start), None),
-        y_position: Position::Relative(Relative::Direction(Direction::Backwards, 20.0), None),
-        background_color: conrod_core::color::DARK_CHARCOAL,
-        shape_color: conrod_core::color::LIGHT_CHARCOAL,
-        border_color: conrod_core::color::BLACK,
-        border_width: 0.0,
-        label_color: conrod_core::color::WHITE,
-        font_id: None,
-        font_size_large: 26,
-        font_size_medium: 18,
-        font_size_small: 12,
-        widget_styling: conrod_core::theme::StyleMap::default(),
-        mouse_drag_threshold: 0.0,
-        double_click_threshold: std::time::Duration::from_millis(500),
-    }
-}
-
-pub struct Gui {
-    all_widgets: all_widgets::Gui,
-    canvas: canvas::Gui,
-    old_demo: old_demo::Gui,
-}
-
-impl Gui {
-    pub fn new(manager: &mut Manager, rust_logo: conrod_core::image::Id) -> Self {
-        manager.update_theme();
-        let ui = manager.ui();
-        Self {
-            all_widgets: all_widgets::Gui::new(ui, rust_logo),
-            canvas: canvas::Gui::new(ui),
-            old_demo: old_demo::Gui::new(ui),
-        }
-    }
-
-    /// Instantiate a GUI demonstrating every widget available in conrod.
-    pub fn update_ui(&mut self, manager: &mut Manager) {
-        //manager.update_theme();
-        let ui = &mut manager.ui().set_widgets();
-        let env = Env::new(ui);
-        match manager.example {
-            Example::New => self.all_widgets.update(ui, &env),
-            Example::Canvas => self.canvas.update(ui, &env),
-            Example::OldDemo => self.old_demo.update(ui, &env),
-        }
-    }
-
 }

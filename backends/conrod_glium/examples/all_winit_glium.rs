@@ -19,9 +19,10 @@ fn main() {
 
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
+    let info = manager.example().info().clone();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title(namer.title(&manager.example()))
-        .with_dimensions((manager.win_w(), manager.win_h()).into());
+        .with_title(namer.title(&info.name))
+        .with_dimensions(info.size.into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -48,7 +49,7 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo(&display.0));
 
     // Construct our `Ui`.
-    let mut gui = conrod_example_shared::Gui::new(&mut manager, rust_logo);
+    manager.init(rust_logo);
 
     // A type used for converting `conrod_core::render::Primitives` into `Command`s that can be used
     // for drawing to the glium `Surface`.
@@ -75,10 +76,11 @@ fn main() {
 
             // Use the `winit` backend feature to convert the winit event to a conrod one.
             if let Some(event) = support::convert_event(event.clone(), &display) {
-                if let Some(example) = manager.handle_event(event) {
+                if let Some(_) = manager.handle_event(event) {
                     let w = display.0.gl_window();
-                    w.set_title(&namer.title(&manager.example()));
-                    w.set_inner_size(example.size().into());
+                    let info = manager.example().info();
+                    w.set_title(&namer.title(&info.name));
+                    w.set_inner_size(info.size.into());
                 }
                 event_loop.needs_update();
             }
@@ -101,7 +103,7 @@ fn main() {
         }
 
         // Instantiate a GUI demonstrating every widget type provided by conrod.
-        gui.update_ui(&mut manager);
+        manager.update();
 
         // Draw the `Ui`.
         if let Some(primitives) = manager.ui().draw_if_changed() {

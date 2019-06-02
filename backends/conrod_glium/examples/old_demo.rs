@@ -18,15 +18,18 @@ extern crate rand; // for making a random color.
 mod support;
 
 use glium::Surface;
+use conrod_example_shared::{
+    Component,
+    old_demo::*
+};
+
 
 fn main() {
-    let example = conrod_example_shared::Example::OldDemo;
-
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title(example.name())
-        .with_dimensions(example.size().into());
+        .with_title(NAME)
+        .with_dimensions(SIZE.into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -34,10 +37,10 @@ fn main() {
     let display = support::GliumDisplayWinitWrapper(display);
 
     // construct our `Ui`.
-    let mut ui = example.new_ui();
+    let mut ui = conrod_core::UiBuilder::new([SIZE.0 as f64, SIZE.1 as f64]).build();
 
     // Identifiers used for instantiating our widgets.
-    let mut gui = conrod_example_shared::old_demo::Gui::new(&mut ui);
+    let mut gui = Gui::new(&mut ui);
 
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();

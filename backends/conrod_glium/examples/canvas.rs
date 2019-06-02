@@ -9,17 +9,19 @@ extern crate glium;
 extern crate image;
 
 use glium::Surface;
+use conrod_example_shared::{
+    Component,
+    canvas::*
+};
 
 mod support;
 
 fn main() {
-    let example = conrod_example_shared::Example::Canvas;
-
     // Build the window.
     let mut events_loop = glium::glutin::EventsLoop::new();
     let window = glium::glutin::WindowBuilder::new()
-        .with_title(example.name())
-        .with_dimensions(example.size().into());
+        .with_title(NAME)
+        .with_dimensions(SIZE.into());
     let context = glium::glutin::ContextBuilder::new()
         .with_vsync(true)
         .with_multisampling(4);
@@ -27,7 +29,7 @@ fn main() {
     let display = support::GliumDisplayWinitWrapper(display);
 
     // construct our `Ui`.
-    let mut ui = example.new_ui();
+    let mut ui = conrod_core::UiBuilder::new([SIZE.0 as f64, SIZE.1 as f64]).build();
 
     // Add a `Font` to the `Ui`'s `font::Map` from file.
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();

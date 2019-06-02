@@ -131,6 +131,7 @@ impl Manager {
                 Box::new(old_demo::Gui::new(ui))
             ));
         }
+        manager.update_theme();
         manager
     }
 

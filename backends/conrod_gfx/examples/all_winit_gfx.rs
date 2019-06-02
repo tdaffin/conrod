@@ -19,6 +19,7 @@ extern crate image;
 extern crate winit;
 
 use gfx::Device;
+use conrod_example_shared::{Manager, Namer};
 
 const CLEAR_COLOR: [f32; 4] = [0.2, 0.2, 0.2, 1.0];
 
@@ -42,12 +43,18 @@ impl<'a> conrod_winit::WinitWindow for WindowRef<'a> {
 // Generate the winit <-> conrod_core type conversion fns.
 conrod_winit::conversion_fns!();
 
+fn update_window(window: &winit::Window, namer: &conrod_example_shared::Namer,
+    info: &conrod_example_shared::Info)
+{
+    window.set_title(&namer.title(&info.name));
+    window.set_inner_size(info.size.into());
+}
+
 fn main() {
-    let mut manager = conrod_example_shared::Manager::new();
-    let namer = conrod_example_shared::Namer::new("Conrod with GFX and Glutin");
+    let namer = Namer::new("Conrod with GFX and Glutin");
 
     // Builder for window
-    let info = manager.example().info().clone();
+    let info = Manager::info();
     let builder = glutin::WindowBuilder::new()
         .with_title(namer.title(&info.name))
         .with_dimensions(info.size.into());
@@ -63,11 +70,6 @@ fn main() {
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
     let mut renderer = conrod_gfx::Renderer::new(&mut factory, &rtv, window.get_hidpi_factor() as f64).unwrap();
-
-    // Load font from file
-    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
-    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Load the Rust logo from our assets folder to use as an example image.
     fn load_rust_logo<T: gfx::format::TextureFormat,R: gfx_core::Resources, F: gfx::Factory<R>>(factory: &mut F) -> (gfx::handle::ShaderResourceView<R, <T as gfx::format::Formatted>::View>,(u32,u32)) {
@@ -105,7 +107,12 @@ fn main() {
     let rust_logo = image_map.insert(load_rust_logo::<conrod_gfx::ColorFormat,_,_>(&mut factory));
 
     // Create Ui and Ids of widgets to instantiate
-    manager.init(rust_logo);
+    let mut manager = conrod_example_shared::Manager::new(rust_logo);
+
+    // Load font from file
+    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
+    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     'main: loop {
         // If the window is closed, this will be None for one tick, so to avoid panicking with
@@ -138,10 +145,7 @@ fn main() {
             // Convert winit event to conrod event, requires conrod to be built with the `winit` feature
             if let Some(event) = convert_event(event.clone(), &WindowRef(window.window())) {
                 if let Some(example_id) = manager.handle_event(event) {
-                    let w = window.window();
-                    let info = manager.example().info();
-                    w.set_title(&namer.title(&info.name));
-                    w.set_inner_size(info.size.into());
+                    update_window(window.window(), &namer, manager.example().info());
                 }
             }
 

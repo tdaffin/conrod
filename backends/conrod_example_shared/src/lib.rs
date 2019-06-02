@@ -33,6 +33,15 @@ pub struct Info {
     pub size: (u32, u32),
 }
 
+impl Info {
+    pub fn new(name: &str, size: (u32, u32)) -> Self {
+        Self {
+            name: name.to_owned(),
+            size,
+        }
+    }
+}
+
 pub struct Example {
     info: Info,
     component: Box<Component>,
@@ -40,12 +49,9 @@ pub struct Example {
 }
 
 impl Example {
-    fn new(name: &str, size: (u32, u32), component: Box<Component>) -> Self {
+    fn new(info: Info, component: Box<Component>) -> Self {
         Self {
-            info: Info {
-                name: name.to_owned(),
-                size,
-            },
+            info,
             component,
             theme: Box::new(|| Theme::default()),
         }
@@ -99,27 +105,33 @@ pub struct Manager {
 }
 
 impl Manager {
-    pub fn new() -> Self {
-        let size = all_widgets::SIZE; // It would be convenient if UiBuilder didn't need an initial size
+    /// Initial info for window and Ui building
+    /// It would be convenient if window building and UiBuilder didn't need an initial size
+    pub fn info() -> Info {
+        all_widgets::info()
+    }
+    
+    pub fn new(rust_logo: conrod_core::image::Id) -> Self {
+        let size = Manager::info().size;
         let ui = conrod_core::UiBuilder::new([size.0 as f64, size.1 as f64]).build();
-        Self {
+        let mut manager = Self {
             examples: Vec::new(),
             example_id: 0,
             ui,
+        };
+        {
+            let ui = &mut manager.ui;
+            manager.examples.push(Example::new(all_widgets::info(),
+                Box::new(all_widgets::Gui::new(ui, rust_logo))
+            ).with_theme(Box::new(all_widgets::theme)));
+            manager.examples.push(Example::new(canvas::info(),
+                Box::new(canvas::Gui::new(ui))
+            ));
+            manager.examples.push(Example::new(old_demo::info(),
+                Box::new(old_demo::Gui::new(ui))
+            ));
         }
-    }
-
-    pub fn init(&mut self, rust_logo: conrod_core::image::Id){
-        let ui = &mut self.ui;
-        self.examples.push(Example::new(all_widgets::NAME, all_widgets::SIZE,
-            Box::new(all_widgets::Gui::new(ui, rust_logo))
-        ).with_theme(Box::new(all_widgets::theme)));
-        self.examples.push(Example::new(canvas::NAME, canvas::SIZE,
-            Box::new(canvas::Gui::new(ui))
-        ));
-        self.examples.push(Example::new(old_demo::NAME, old_demo::SIZE,
-            Box::new(old_demo::Gui::new(ui))
-        ));
+        manager
     }
 
     pub fn ui(&mut self) -> &mut Ui {

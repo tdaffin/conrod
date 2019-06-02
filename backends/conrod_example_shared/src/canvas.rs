@@ -10,10 +10,11 @@ use conrod_core::{
     color,
     widget,
 };
-use super::{Component, Env};
+use super::{Component, Env, Info};
 
-pub const NAME: &str = "Canvas";
-pub const SIZE: (u32, u32) = (800, 600);
+pub fn info() -> Info {
+    Info::new("Canvas", (800, 600))
+}
 
 // Generate a unique `WidgetId` for each widget.
 widget_ids! {

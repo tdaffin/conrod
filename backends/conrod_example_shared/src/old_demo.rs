@@ -10,10 +10,11 @@ use conrod_core::{
     color,
     widget,
 };
-use super::{Component, Env};
+use super::{Component, Env, Info};
 
-pub const NAME: &str = "Widget Demonstration";
-pub const SIZE: (u32, u32) = (1100, 560);
+pub fn info() -> Info {
+    Info::new("Widget Demonstration", (1100, 560))
+}
 
 /// This struct holds all of the variables used to demonstrate application data being passed
 /// through the widgets. If some of these seem strange, that's because they are! Most of these

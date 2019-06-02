@@ -18,11 +18,12 @@ use conrod_core::{
     color,
     widget,
 };
-use super::{Component, Env};
+use super::{Component, Env, Info};
 use self::layout::*;
 
-pub const NAME: &str = "All Widgets";
-pub const SIZE: (u32, u32) = (600, 420);
+pub fn info() -> Info {
+    Info::new("All Widgets", (600, 420))
+}
 
 /// A set of reasonable stylistic defaults that works for the `gui` below.
 pub fn theme() -> conrod_core::Theme {

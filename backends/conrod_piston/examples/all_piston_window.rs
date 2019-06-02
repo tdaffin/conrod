@@ -10,26 +10,22 @@ use self::piston_window::{AdvancedWindow, PistonWindow, UpdateEvent, Window, Win
 use self::piston_window::{Flip, G2d, G2dTexture, Texture, TextureSettings};
 use self::piston_window::OpenGL;
 use self::piston_window::texture::UpdateTexture;
+use conrod_example_shared::{Manager, Namer};
 
 pub fn main() {
-    let mut manager = conrod_example_shared::Manager::new();
-    let namer = conrod_example_shared::Namer::new("Piston Backend");
+    let info = Manager::info();
+    let namer = Namer::new("Piston Backend");
 
     // Construct the window.
-    let size = manager.example().info().size;
+    let size = info.size;
     let mut window: PistonWindow =
-        WindowSettings::new(namer.title(&manager.example().info().name), [size.0, size.1])
+        WindowSettings::new(namer.title(&info.name), [size.0, size.1])
             .opengl(OpenGL::V3_2) // If not working, try `OpenGL::V2_1`.
             .samples(4)
             .exit_on_esc(true)
             .vsync(true)
             .build()
             .unwrap();
-
-    // Add a `Font` to the `Ui`'s `font::Map` from file.
-    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
-    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
-    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Create a texture to use for efficiently caching text on the GPU.
     let mut text_vertex_data = Vec::new();
@@ -65,7 +61,12 @@ pub fn main() {
     let rust_logo = image_map.insert(rust_logo);
 
     // Instantiate the generated list of widget identifiers.
-    manager.init(rust_logo);
+    let mut manager = Manager::new(rust_logo);
+
+    // Add a `Font` to the `Ui`'s `font::Map` from file.
+    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
+    let font_path = assets.join("fonts/NotoSans/NotoSans-Regular.ttf");
+    manager.ui().fonts.insert_from_file(font_path).unwrap();
 
     // Poll events from the window.
     while let Some(event) = window.next() {

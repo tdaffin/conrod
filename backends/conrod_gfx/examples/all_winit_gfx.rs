@@ -52,9 +52,9 @@ fn update_window(window: &winit::Window, namer: &conrod_example_shared::Namer,
 
 fn main() {
     let namer = Namer::new("Conrod with GFX and Glutin");
+    let info = Manager::info();
 
     // Builder for window
-    let info = Manager::info();
     let builder = glutin::WindowBuilder::new()
         .with_title(namer.title(&info.name))
         .with_dimensions(info.size.into());
